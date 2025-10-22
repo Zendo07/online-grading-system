@@ -1,0 +1,108 @@
+<?php
+require_once 'includes/config.php';
+require_once 'includes/session.php';
+
+// If already logged in, redirect to dashboard
+if (isLoggedIn()) {
+    redirectToDashboard();
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Grading System - Home</title>
+    <link rel="stylesheet" href="<?php echo CSS_PATH; ?>style.css">
+    <link rel="stylesheet" href="<?php echo CSS_PATH; ?>landing.css">
+</head>
+<body class="landing-page">
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="container navbar-container">
+            <a href="index.php" class="navbar-brand">📚 indEx</a>
+            <ul class="navbar-nav">
+                <li><a href="#features" class="nav-link">Features</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="auth/login.php" class="btn btn-primary btn-sm">Login</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section" style="background: linear-gradient(135deg, #8B4049 0%, #6B3039 100%);">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Welcome to indEx Grading System</h1>
+                <p>Streamline your classroom management with our easy-to-use grading platform.</p>
+                <div class="hero-buttons">
+                    <a href="auth/login.php" class="btn btn-light btn-lg" style="background: white; color: #8B4049;">Get Started</a>
+                    <a href="auth/register.php" class="btn btn-outline btn-lg" style="border-color: white; color: white;">Create Account</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Why Choose Our System?</h2>
+                <p>Powerful features designed for teachers and students</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">👨‍🏫</div>
+                    <h3>For Teachers</h3>
+                    <p>Create classes, manage students, track attendance, and input grades efficiently.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👨‍🎓</div>
+                    <h3>For Students</h3>
+                    <p>View grades, check attendance, and stay updated on your academic progress.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Real-time Updates</h3>
+                    <p>Get instant access to grades and attendance records anytime, anywhere.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Secure & Private</h3>
+                    <p>Your data is protected with industry-standard security measures.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>Mobile Friendly</h3>
+                    <p>Access the system from any device - desktop, tablet, or smartphone.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📝</div>
+                    <h3>Easy to Use</h3>
+                    <p>Intuitive interface designed for users of all technical levels.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section class="cta-section" id="about">
+        <div class="container">
+            <h2>Ready to Get Started?</h2>
+            <p>Join thousands of teachers and students using our platform</p>
+            <div class="hero-buttons">
+                <a href="auth/register.php" class="btn btn-light btn-lg">Sign Up Now</a>
+                <a href="auth/login.php" class="btn btn-outline btn-lg">Login</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; <?php echo date('Y'); ?> Online Grading System. All rights reserved.</p>
+            <p>Developed for educational purposes</p>
+        </div>
+    </footer>
+</body>
+</html>
