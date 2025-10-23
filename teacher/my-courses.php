@@ -525,6 +525,87 @@ $flash = getFlashMessage();
                 closeStudentCard();
             }
         });
+        // Close modal when clicking outside
+        document.getElementById('studentCardModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeStudentCard();
+            }
+        });
+        
+        // ========== ADD THESE NEW FUNCTIONS BELOW ========== //
+        
+        // Auto-save grade when input changes
+        document.addEventListener('DOMContentLoaded', function() {
+            const gradeInputs = document.querySelectorAll('.editable-cell input');
+            
+            gradeInputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    saveGradeInline(this);
+                });
+                
+                input.addEventListener('blur', function() {
+                    saveGradeInline(this);
+                });
+            });
+        });
+
+        function saveGradeInline(input) {
+            const studentId = input.dataset.student;
+            const activityType = input.dataset.type;
+            const score = parseFloat(input.value) || 0;
+            const classId = <?php echo $selected_section['class_id'] ?? 0; ?>;
+            const gradingPeriod = '<?php echo $grading_period; ?>';
+            
+            input.style.borderColor = '#f59e0b';
+            
+            fetch('<?php echo BASE_URL; ?>api/teacher/save-grade-inline.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    student_id: studentId,
+                    class_id: classId,
+                    activity_type: activityType,
+                    score: score,
+                    grading_period: gradingPeriod
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    input.style.borderColor = '#10b981';
+                    setTimeout(() => {
+                        input.style.borderColor = 'transparent';
+                    }, 2000);
+                    updateOverallGrade(input.closest('tr'));
+                } else {
+                    input.style.borderColor = '#ef4444';
+                    alert('Error saving: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Save error:', error);
+                input.style.borderColor = '#ef4444';
+            });
+        }
+
+        function updateOverallGrade(row) {
+            const inputs = row.querySelectorAll('.editable-cell input');
+            let sum = 0;
+            let count = 0;
+            
+            inputs.forEach(input => {
+                const val = parseFloat(input.value) || 0;
+                sum += val;
+                count++;
+            });
+            
+            const overall = count > 0 ? (sum / count) : 0;
+            const overallCell = row.querySelector('td:last-child strong');
+            if (overallCell) {
+                overallCell.textContent = overall.toFixed(2) + '%';
+            }
+        }
     </script>
 </body>
 </html>
+    

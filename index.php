@@ -13,30 +13,30 @@ if (isLoggedIn()) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Grading System - Home</title>
-    <link rel="stylesheet" href="<?php echo CSS_PATH; ?>style.css">
-    <link rel="stylesheet" href="<?php echo CSS_PATH; ?>landing.css">
+    <link rel="stylesheet" href="<?php echo CSS_PATH; ?>style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="<?php echo CSS_PATH; ?>landing.css?v=<?php echo time(); ?>">
 </head>
 <body class="landing-page">
     <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="container navbar-container">
-            <a href="index.php" class="navbar-brand">📚 indEx</a>
+            <a href="index.php" class="navbar-brand">📚 Grading System</a>
             <ul class="navbar-nav">
                 <li><a href="#features" class="nav-link">Features</a></li>
                 <li><a href="#about" class="nav-link">About</a></li>
-                <li><a href="auth/login.php" class="btn btn-primary btn-sm">Login</a></li>
+                <li><a href="auth/login.php" class="btn btn-primary btn-sm" style="background: linear-gradient(135deg, #8B4049 0%, #6B3039 100%); color: white;">Login</a></li>
             </ul>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero-section" style="background: linear-gradient(135deg, #8B4049 0%, #6B3039 100%);">
+    <section class="hero-section" style="background: linear-gradient(135deg, #7b2d26 0%, #D96C3D 100%);">
         <div class="container">
             <div class="hero-content">
-                <h1>Welcome to indEx Grading System</h1>
-                <p>Streamline your classroom management with our easy-to-use grading platform.</p>
+                <h1>Welcome to IndEX</h1>
+                <p>Your pocket-sized library for a digital tomorrow—an online index card that keeps knowledge neat, fast, and always within reach.</p>
                 <div class="hero-buttons">
-                    <a href="auth/login.php" class="btn btn-light btn-lg" style="background: white; color: #8B4049;">Get Started</a>
+                    <a href="auth/login.php" class="btn btn-light btn-lg" style="background: white; color: #7b2d26;">Get Started</a>
                     <a href="auth/register.php" class="btn btn-outline btn-lg" style="border-color: white; color: white;">Create Account</a>
                 </div>
             </div>

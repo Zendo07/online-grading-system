@@ -77,19 +77,50 @@ $flash = getFlashMessage();
 </head>
 <body>
     <div class="dashboard-wrapper">
-        <?php include '../includes/teacher-nav.php'; ?>
+        <!-- Top Navigation Bar -->
+        <nav class="top-navbar">
+            <div class="navbar-left">
+                <div class="hamburger-menu" id="hamburgerMenu">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </div>
+                <a href="dashboard.php" class="navbar-brand">IndEX</a>
+            </div>
+            <div class="navbar-right">
+                <div class="profile-dropdown">
+                    <div class="profile-button">
+                        <img src="<?php echo getProfilePicture($teacher['profile_picture'], $teacher['full_name']); ?>" alt="Profile">
+                    </div>
+                    <div class="profile-menu">
+                        <a href="profile.php" class="profile-menu-item">
+                            <span>👤</span>
+                            <span>Profile Settings</span>
+                        </a>
+                        <a href="change-password.php" class="profile-menu-item">
+                            <span>🔑</span>
+                            <span>Change Password</span>
+                        </a>
+                        <a href="<?php echo BASE_URL; ?>auth/logout.php" class="profile-menu-item" onclick="return confirm('Are you sure you want to logout?');">
+                            <span>🚪</span>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <?php include '../includes/teacher-nav.php'; ?>
+        </aside>
         
+        <!-- Main Content -->
         <div class="main-content">
-            <header class="top-header">
-                <button class="menu-toggle" id="menuToggle">☰</button>
-                <div class="page-title-section">
-                    <h1>Dashboard</h1>
-                    <p class="breadcrumb">Home / Dashboard</p>
-                </div>
-                <div class="header-actions">
-                    <span>Welcome, <?php echo htmlspecialchars($_SESSION['full_name']); ?></span>
-                </div>
-            </header>
+            <div class="page-header">
+                <h1 class="page-title">Dashboard</h1>
+                <p class="page-subtitle">Welcome back, <?php echo htmlspecialchars($_SESSION['full_name']); ?></p>
+            </div>
             
             <div class="dashboard-content">
                 <?php if ($flash): ?>
@@ -140,7 +171,7 @@ $flash = getFlashMessage();
                     </div>
                     <div class="card-body">
                         <div class="action-buttons">
-                            <a href="create-class.php" class="btn btn-primary">➕ Create New Class</a>
+                            <a href="create-class.php" class="btn btn-primary" style="background: linear-gradient(135deg, #8B4049 0%, #6B3039 100%); color: white; border: none;">➕ Create New Class</a>
                             <a href="attendance.php" class="btn btn-success">📋 Mark Attendance</a>
                             <a href="grades.php" class="btn btn-warning">📝 Input Grades</a>
                             <a href="student-records.php" class="btn btn-info">📊 View Records</a>
