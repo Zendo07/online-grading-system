@@ -20,7 +20,7 @@ if (isLoggedIn()) {
     <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="container navbar-container">
-            <a href="index.php" class="navbar-brand">📚 Grading System</a>
+            <a href="index.php" class="navbar-brand">📚 indEx</a>
             <ul class="navbar-nav">
                 <li><a href="#features" class="nav-link">Features</a></li>
                 <li><a href="#about" class="nav-link">About</a></li>
@@ -37,8 +37,6 @@ if (isLoggedIn()) {
                 <p>Your pocket-sized library for a digital tomorrow—an online index card that keeps knowledge neat, fast, and always within reach.</p>
                 <div class="hero-buttons">
                     <a href="auth/login.php" class="btn btn-light btn-lg" style="background: white; color: #7b2d26;">Get Started</a>
-                    <a href="auth/register.php" class="btn btn-outline btn-lg" style="border-color: white; color: white;">Create Account</a>
-                </div>
             </div>
         </div>
     </section>
@@ -91,7 +89,7 @@ if (isLoggedIn()) {
             <h2>Ready to Get Started?</h2>
             <p>Join thousands of teachers and students using our platform</p>
             <div class="hero-buttons">
-                <a href="auth/register.php" class="btn btn-light btn-lg">Sign Up Now</a>
+                <a href="auth/login.php" class="btn btn-light btn-lg">Sign Up Now</a>
                 <a href="auth/login.php" class="btn btn-outline btn-lg">Login</a>
             </div>
         </div>

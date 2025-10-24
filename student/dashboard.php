@@ -69,20 +69,14 @@ $flash = getFlashMessage();
         <?php include '../includes/student-nav.php'; ?>
         
         <div class="main-content">
-            <header class="top-header">
-                <button class="menu-toggle" id="menuToggle">☰</button>
-                <div class="page-title-section">
-                    <h1>Dashboard</h1>
-                    <p class="breadcrumb">Home / Dashboard</p>
-                </div>
-                <div class="header-actions">
-                    <span>Welcome, <?php echo htmlspecialchars($_SESSION['full_name']); ?></span>
-                </div>
-            </header>
-            
             <div class="dashboard-content">
+                <div style="margin-bottom: 24px;">
+                    <h1 style="font-size: 2rem; margin: 0 0 8px 0; color: #202124;">Dashboard</h1>
+                    <p style="color: #5f6368; margin: 0;">Welcome back, <?php echo htmlspecialchars($_SESSION['full_name']); ?>!</p>
+                </div>
+                
                 <?php if ($flash): ?>
-                    <div class="alert alert-<?php echo $flash['type']; ?>">
+                    <div class="alert alert-<?php echo $flash['type']; ?>" style="margin-bottom: 24px;">
                         <?php echo htmlspecialchars($flash['message']); ?>
                     </div>
                 <?php endif; ?>
@@ -128,7 +122,7 @@ $flash = getFlashMessage();
                         <h2 class="card-title">Quick Actions</h2>
                     </div>
                     <div class="card-body">
-                        <div class="action-buttons">
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                             <a href="join-class.php" class="btn btn-primary">➕ Join New Class</a>
                             <a href="my-grades.php" class="btn btn-success">📝 View My Grades</a>
                             <a href="my-attendance.php" class="btn btn-warning">📋 Check Attendance</a>
@@ -182,5 +176,6 @@ $flash = getFlashMessage();
     </div>
     
     <script src="<?php echo JS_PATH; ?>main.js"></script>
+    <script src="<?php echo JS_PATH; ?>dashboard-nav.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

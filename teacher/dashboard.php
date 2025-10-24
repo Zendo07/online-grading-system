@@ -9,14 +9,14 @@ requireTeacher();
 // Get teacher data
 $teacher_id = $_SESSION['user_id'];
 
-// Get statistics
+// Get statistics (same as before)
 try {
     // Total classes
     $stmt = $conn->prepare("SELECT COUNT(*) as total FROM classes WHERE teacher_id = ? AND status = 'active'");
     $stmt->execute([$teacher_id]);
     $total_classes = $stmt->fetch()['total'];
     
-    // Total students across all classes
+    // Total students
     $stmt = $conn->prepare("
         SELECT COUNT(DISTINCT e.student_id) as total 
         FROM enrollments e
@@ -26,7 +26,7 @@ try {
     $stmt->execute([$teacher_id]);
     $total_students = $stmt->fetch()['total'];
     
-    // Recent attendance records (today)
+    // Recent attendance
     $stmt = $conn->prepare("
         SELECT COUNT(*) as total 
         FROM attendance a
@@ -36,7 +36,7 @@ try {
     $stmt->execute([$teacher_id]);
     $today_attendance = $stmt->fetch()['total'];
     
-    // Total grade entries
+    // Total grades
     $stmt = $conn->prepare("
         SELECT COUNT(*) as total 
         FROM grades g
@@ -63,7 +63,6 @@ try {
     error_log("Dashboard Error: " . $e->getMessage());
 }
 
-// Get flash message
 $flash = getFlashMessage();
 ?>
 <!DOCTYPE html>
@@ -77,54 +76,17 @@ $flash = getFlashMessage();
 </head>
 <body>
     <div class="dashboard-wrapper">
-        <!-- Top Navigation Bar -->
-        <nav class="top-navbar">
-            <div class="navbar-left">
-                <div class="hamburger-menu" id="hamburgerMenu">
-                    <span class="hamburger-line"></span>
-                    <span class="hamburger-line"></span>
-                    <span class="hamburger-line"></span>
-                </div>
-                <a href="dashboard.php" class="navbar-brand">IndEX</a>
-            </div>
-            <div class="navbar-right">
-                <div class="profile-dropdown">
-                    <div class="profile-button">
-                        <img src="<?php echo getProfilePicture($teacher['profile_picture'], $teacher['full_name']); ?>" alt="Profile">
-                    </div>
-                    <div class="profile-menu">
-                        <a href="profile.php" class="profile-menu-item">
-                            <span>👤</span>
-                            <span>Profile Settings</span>
-                        </a>
-                        <a href="change-password.php" class="profile-menu-item">
-                            <span>🔑</span>
-                            <span>Change Password</span>
-                        </a>
-                        <a href="<?php echo BASE_URL; ?>auth/logout.php" class="profile-menu-item" onclick="return confirm('Are you sure you want to logout?');">
-                            <span>🚪</span>
-                            <span>Logout</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </nav>
-
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <?php include '../includes/teacher-nav.php'; ?>
-        </aside>
+        <?php include '../includes/teacher-nav.php'; ?>
         
-        <!-- Main Content -->
         <div class="main-content">
-            <div class="page-header">
-                <h1 class="page-title">Dashboard</h1>
-                <p class="page-subtitle">Welcome back, <?php echo htmlspecialchars($_SESSION['full_name']); ?></p>
-            </div>
-            
             <div class="dashboard-content">
+                <div style="margin-bottom: 24px;">
+                    <h1 style="font-size: 2rem; margin: 0 0 8px 0; color: #202124;">Dashboard</h1>
+                    <p style="color: #5f6368; margin: 0;">Welcome back, <?php echo htmlspecialchars($_SESSION['full_name']); ?>!</p>
+                </div>
+                
                 <?php if ($flash): ?>
-                    <div class="alert alert-<?php echo $flash['type']; ?>">
+                    <div class="alert alert-<?php echo $flash['type']; ?>" style="margin-bottom: 24px;">
                         <?php echo htmlspecialchars($flash['message']); ?>
                     </div>
                 <?php endif; ?>
@@ -170,11 +132,11 @@ $flash = getFlashMessage();
                         <h2 class="card-title">Quick Actions</h2>
                     </div>
                     <div class="card-body">
-                        <div class="action-buttons">
-                            <a href="create-class.php" class="btn btn-primary" style="background: linear-gradient(135deg, #8B4049 0%, #6B3039 100%); color: white; border: none;">➕ Create New Class</a>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <a href="create-class.php" class="btn btn-primary">➕ Create New Class</a>
                             <a href="attendance.php" class="btn btn-success">📋 Mark Attendance</a>
                             <a href="grades.php" class="btn btn-warning">📝 Input Grades</a>
-                            <a href="student-records.php" class="btn btn-info">📊 View Records</a>
+                            <a href="my-courses.php" class="btn btn-info">📊 View Courses</a>
                         </div>
                     </div>
                 </div>
@@ -231,5 +193,6 @@ $flash = getFlashMessage();
     </div>
     
     <script src="<?php echo JS_PATH; ?>main.js"></script>
+    <script src="<?php echo JS_PATH; ?>dashboard-nav.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

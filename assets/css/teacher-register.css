@@ -1,0 +1,315 @@
+/* ===== RESET ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ===== COLOR & TYPOGRAPHY VARIABLES ===== */
+:root {
+  --maroon: #7b2d26;
+  --maroon-dark: #661f1b;
+  --maroon-light: #a74c42;
+  --gold: #f5a623;
+  --cream: #f9efef;
+  --white: #ffffff;
+  --gray-dark: #333333;
+  --gray-medium: #777777;
+  --gray-light: #e0e0e0;
+  --input-border: #d9d9d9;
+  --error: #e74c3c;
+}
+
+/* ===== BODY ===== */
+body {
+  font-family: "Poppins", Arial, Helvetica, sans-serif;
+  background: var(--white);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  color: var(--white);
+  line-height: 1.5;
+  padding: 0;
+}
+
+/* ===== MAIN CONTAINER ===== */
+.signup-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  background: var(--cream);
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 1200px;
+  overflow: hidden;
+  padding: 30px;
+  margin: 2rem auto;
+  
+}
+
+/* ===== LEFT: FORM SECTION ===== */
+.form-section {
+  flex: 1;
+  flex-shrink: 0;
+  max-width: 450px;
+  padding-right: 20px;
+  color: var(--gray-dark);
+}
+
+.form-section h1 {
+  font-size: 34px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--maroon);
+}
+
+.form-section p {
+  font-size: 16px;
+  color: var(--gray-medium);
+  margin-bottom: 28px;
+}
+
+/* ===== INPUT GROUPS ===== */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+label {
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: var(--maroon);
+}
+
+/* ===== INPUTS ===== */
+input {
+  padding: 12px 14px;
+  font-size: 15px;
+  border-radius: 6px;
+  border: 1px solid var(--input-border);
+  background: var(--white);
+  color: var(--gray-dark);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+}
+
+input::placeholder {
+  color: #aaaaaa;
+  font-size: 14px;
+}
+
+input:focus {
+  border: 1px solid var(--maroon);
+  box-shadow: 0 0 0 2px rgba(123, 45, 38, 0.2);
+}
+
+/* Error state */
+input.error {
+  border: 1px solid var(--error);
+  color: var(--error);
+}
+
+/* ===== NAME ROW ===== */
+.name-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+}
+
+.name-row .input-group {
+  flex: 1;
+  min-width: 0;
+}
+
+.name-row input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ===== BUTTONS ===== */
+.btn-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+/* Base button style */
+button {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 10px 24px;
+  transition: background 0.25s ease, transform 0.2s ease;
+}
+
+/* Back (Secondary Button) */
+.back-btn {
+  background: transparent;
+  color: var(--maroon);
+  border: 1px solid var(--maroon);
+}
+
+.back-btn:hover {
+  background: var(--maroon);
+  color: var(--white);
+}
+
+/* Next (Primary Button) */
+.next-btn {
+  background: var(--maroon);
+  color: var(--white);
+  border: none;
+  min-width: 130px;
+}
+
+.next-btn:hover {
+  background: var(--maroon-dark);
+  transform: translateY(-1px);
+}
+
+/* Disabled Button */
+button:disabled {
+  background: var(--gray-light);
+  color: var(--gray-medium);
+  border: none;
+  cursor: not-allowed;
+}
+
+/* ===== IMAGE SECTION ===== */
+.side-img {
+  flex: 1;
+  max-width: 480px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  background-color: var(--maroon);
+  color: var(--white);
+  font-size: 14px;
+  margin-top: auto;
+  width: 100%;
+}
+
+.footer p {
+  color: var(--white);
+  margin: 0;
+}
+
+.footer a {
+  color: var(--white);
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+}
+
+.footer a:hover {
+  color: var(--gold);
+  text-decoration: underline;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .signup-container {
+    flex-direction: column-reverse;
+    align-items: center;
+    padding: 40px 30px;
+    margin: 2rem 0;
+    gap: 0;
+  }
+
+  .form-section {
+    max-width: 100%;
+    width: 100%;
+    text-align: center;
+    padding-right: 0;
+  }
+
+  .name-row {
+    flex-direction: column;
+    text-align: left;
+  }
+
+  .input-group {
+    text-align: left;
+  }
+
+  .btn-row {
+    flex-direction: row-reverse;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .btn-row button {
+    flex: 1;
+  }
+
+  .side-img {
+    width: 70%;
+    max-width: 300px;
+    margin-bottom: 30px;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center; 
+  padding: 12px 24px;
+  background-color: var(--maroon);
+  color: var(--white);
+  border-bottom: 2px solid var(--maroon-light);
+  position: sticky;
+  z-index: 101;
+}
+
+.headerLeft,
+.headerCenter,
+.headerRight {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.headerLeft {
+  gap: 16px;
+  justify-content: flex-start;
+}
+
+.headerCenter {
+  justify-content: center;
+}
+
+.headerRight {
+  justify-content: flex-end;
+}
+
+.header .logo {
+  height: 40px; 
+  width: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--white); 
+  object-fit: cover;
+}
+
+.header h1 {
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--white);
+  margin: 0; 
+}
