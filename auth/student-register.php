@@ -16,7 +16,7 @@ $flash = getFlashMessage();
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Teacher Registration | PSU</title>
+<title>Student Registration | PSU</title>
 
 <!-- Main Styles -->
 <link rel="stylesheet" href="../assets/css/teacher-register.css">
@@ -46,7 +46,7 @@ $flash = getFlashMessage();
   <div class="signup-container">
     <div class="form-section">
       <h1>Sign Up</h1>
-      <p>Enter your teacher account information below.</p>
+      <p>Enter your student account information below.</p>
 
       <!-- Success/Error Toast -->
       <div id="toast" style="display: none; position: fixed; top: 20px; right: 20px; padding: 15px 20px; border-radius: 8px; color: white; font-weight: 500; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: slideIn 0.3s ease;"></div>
@@ -57,24 +57,11 @@ $flash = getFlashMessage();
         </div>
       <?php endif; ?>
 
-      <!-- ✅ Correct Form Tag with proper field names -->
+      <!-- ✅ Correct Form Tag -->
       <form method="POST" action="../api/auth/register-handler.php" id="registerForm">
 
         <!-- Hidden Role -->
-        <input type="hidden" name="role" value="teacher">
-
-        <!-- Invitation Code -->
-        <div class="input-group">
-          <label for="invitation_code">🎟️ Teacher Invitation Code</label>
-          <input 
-            type="text" 
-            id="invitation_code" 
-            name="invitation_code" 
-            placeholder="Enter invitation code (e.g., TEACH2025)" 
-            required
-          />
-          <small>Contact the admin to get your teacher code.</small>
-        </div>
+        <input type="hidden" name="role" value="student">
 
         <!-- Name Row -->
         <div class="name-row">
@@ -113,20 +100,18 @@ $flash = getFlashMessage();
           />
         </div>
 
-        <!-- Username -->
+        <!-- Student Number (Optional) -->
         <div class="input-group">
-          <label for="username">🧑‍💻 Username</label>
+          <label for="student_number">🎓 Student Number (Optional)</label>
           <input 
             type="text" 
-            id="username" 
-            name="username" 
-            placeholder="Username" 
-            required
-            minlength="3"
+            id="student_number" 
+            name="student_number" 
+            placeholder="e.g., 2024-12345"
           />
         </div>
 
-        <!-- Contact Number -->
+        <!-- Contact Number (Optional) -->
         <div class="input-group">
           <label for="contact_number">📞 Contact Number (Optional)</label>
           <input 
@@ -212,13 +197,6 @@ $flash = getFlashMessage();
     form.addEventListener('submit', function(e) {
       const password = document.getElementById('password').value;
       const confirmPassword = document.getElementById('confirm_password').value;
-      const invitationCode = document.getElementById('invitation_code').value;
-
-      if (!invitationCode.trim()) {
-        e.preventDefault();
-        showToast('Teacher invitation code is required!', 'error');
-        return false;
-      }
 
       if (password !== confirmPassword) {
         e.preventDefault();
@@ -262,7 +240,7 @@ $flash = getFlashMessage();
     if (urlParams.get('success') === '1') {
       showToast('Account created successfully! Redirecting...', 'success');
       setTimeout(() => {
-        window.location.href = '../teacher/dashboard.php';
+        window.location.href = '../student/dashboard.php';
       }, 1500);
     }
   </script>

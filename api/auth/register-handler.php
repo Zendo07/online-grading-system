@@ -2,9 +2,11 @@
 require_once '../../includes/config.php';
 require_once '../../includes/functions.php';
 
-// Only allow POST requests
+session_start(); // ✅ ensure session starts for auto-login
+
+// Allow only POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: ' . BASE_URL . 'auth/register.php');
+    header('Location: ' . BASE_URL . 'auth/login.php');
     exit();
 }
 
@@ -12,118 +14,144 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $role = sanitize($_POST['role']);
 $first_name = sanitize($_POST['first_name']);
 $last_name = sanitize($_POST['last_name']);
-$full_name = $first_name . ' ' . $last_name;
+$full_name = trim($first_name . ' ' . $last_name);
 $email = sanitize($_POST['email']);
 $password = $_POST['password'];
 $confirm_password = $_POST['confirm_password'];
+
 $invitation_code = isset($_POST['invitation_code']) ? sanitize($_POST['invitation_code']) : '';
 $username = isset($_POST['username']) ? sanitize($_POST['username']) : '';
 $contact_number = isset($_POST['contact_number']) ? sanitize($_POST['contact_number']) : '';
 $student_number = isset($_POST['student_number']) ? sanitize($_POST['student_number']) : '';
 $program = isset($_POST['program']) ? sanitize($_POST['program']) : '';
 
-// Validate input
-if (empty($role) || empty($full_name) || empty($email) || empty($password) || empty($confirm_password)) {
-    redirectWithMessage(BASE_URL . 'auth/teacher-register.php', 'danger', 'Please fill in all required fields.');
+// Determine redirect URLs
+$redirect_register = ($role === 'teacher')
+    ? BASE_URL . 'auth/teacher-register.php'
+    : BASE_URL . 'auth/student-register.php';
+
+$redirect_success = ($role === 'teacher')
+    ? BASE_URL . 'teacher/dashboard.php'
+    : BASE_URL . 'student/dashboard.php';
+
+// =====================================
+// 🧩 Basic validation
+// =====================================
+if (empty($role) || empty($first_name) || empty($last_name) || empty($email) || empty($password) || empty($confirm_password)) {
+    redirectWithMessage($redirect_register, 'danger', 'Please fill in all required fields.');
 }
 
-// Validate role
 if (!in_array($role, ['teacher', 'student'])) {
-    redirectWithMessage(BASE_URL . 'auth/teacher-register.php', 'danger', 'Invalid role selected.');
+    redirectWithMessage($redirect_register, 'danger', 'Invalid role selected.');
 }
 
-// Validate email
 if (!isValidEmail($email)) {
-    redirectWithMessage(BASE_URL . 'auth/register.php', 'danger', 'Invalid email address.');
+    redirectWithMessage($redirect_register, 'danger', 'Invalid email address.');
 }
 
-// Validate password length
 if (strlen($password) < PASSWORD_MIN_LENGTH) {
-    redirectWithMessage(BASE_URL . 'auth/register.php', 'danger', 'Password must be at least ' . PASSWORD_MIN_LENGTH . ' characters.');
+    redirectWithMessage($redirect_register, 'danger', 'Password must be at least ' . PASSWORD_MIN_LENGTH . ' characters.');
 }
 
-// Check if passwords match
 if ($password !== $confirm_password) {
-    redirectWithMessage(BASE_URL . 'auth/register.php', 'danger', 'Passwords do not match.');
+    redirectWithMessage($redirect_register, 'danger', 'Passwords do not match.');
 }
 
-// ================================
-// ✅ TEACHER-SPECIFIC VALIDATION
-// ================================
+// =====================================
+// 🧩 Teacher-specific validation
+// =====================================
 if ($role === 'teacher') {
-
-    // Invitation code check (existing)
     if (empty($invitation_code)) {
-        redirectWithMessage(BASE_URL . 'auth/register.php', 'danger', 'Teacher invitation code is required.');
+        redirectWithMessage($redirect_register, 'danger', 'Teacher invitation code is required.');
     }
 
-    $stmt = $conn->prepare("SELECT code_id, is_used FROM teacher_codes WHERE invitation_code = ?");
+    // Check if code exists
+    $stmt = $conn->prepare("SELECT code_id FROM teacher_codes WHERE invitation_code = ?");
     $stmt->execute([$invitation_code]);
     $code = $stmt->fetch();
 
     if (!$code) {
-        redirectWithMessage(BASE_URL . 'auth/register.php', 'danger', 'Invalid invitation code.');
+        redirectWithMessage($redirect_register, 'danger', 'Invalid invitation code.');
     }
 
-    if ($code['is_used']) {
-        redirectWithMessage(BASE_URL . 'auth/register.php', 'danger', 'This invitation code has already been used.');
-    }
-
-    // ✅ Additional validation for teacher fields
+    // Check for username
     if (empty($username)) {
-        redirectWithMessage(BASE_URL . 'auth/register.php', 'danger', 'Username is required for teachers.');
+        redirectWithMessage($redirect_register, 'danger', 'Username is required for teachers.');
     }
 
     // Check if username already exists
     $stmt = $conn->prepare("SELECT user_id FROM users WHERE username = ?");
     $stmt->execute([$username]);
     if ($stmt->rowCount() > 0) {
-        redirectWithMessage(BASE_URL . 'auth/register.php', 'danger', 'Username is already taken.');
+        redirectWithMessage($redirect_register, 'danger', 'Username is already taken.');
     }
 }
 
+// =====================================
+// 🧩 Student-specific validation
+// =====================================
+if ($role === 'student') {
+    if (empty($student_number)) {
+        redirectWithMessage($redirect_register, 'danger', 'Student number is required.');
+    }
+
+    // Prevent duplicate student number
+    $stmt = $conn->prepare("SELECT user_id FROM users WHERE student_number = ?");
+    $stmt->execute([$student_number]);
+    if ($stmt->rowCount() > 0) {
+        redirectWithMessage($redirect_register, 'danger', 'This student number is already registered.');
+    }
+}
+
+// =====================================
+// ✅ Database Insertion
+// =====================================
 try {
-    // Check if email already exists
+    // Check if email exists
     $stmt = $conn->prepare("SELECT user_id FROM users WHERE email = ?");
     $stmt->execute([$email]);
-
     if ($stmt->rowCount() > 0) {
-        redirectWithMessage(BASE_URL . 'auth/register.php', 'danger', 'Email address is already registered.');
+        redirectWithMessage($redirect_register, 'danger', 'Email is already registered.');
     }
 
     // Hash password
     $hashed_password = hashPassword($password);
 
-    // Begin transaction
     $conn->beginTransaction();
 
-    // ================================
-    // ✅ INSERT USER (common logic)
-    // ================================
-    $stmt = $conn->prepare("INSERT INTO users (email, password, full_name, role, status, username, contact_number) VALUES (?, ?, ?, ?, 'active', ?, ?)");
-    $stmt->execute([$email, $hashed_password, $full_name, $role, $username, $contact_number]);
+    // Insert user
+    $stmt = $conn->prepare("
+        INSERT INTO users (email, password, full_name, role, username, contact_number, student_number, program, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active')
+    ");
+    $stmt->execute([$email, $hashed_password, $full_name, $role, $username, $contact_number, $student_number, $program]);
 
     $user_id = $conn->lastInsertId();
 
-    // If teacher, mark invitation code as used
+    // Track code usage (for teachers only)
     if ($role === 'teacher' && isset($code['code_id'])) {
-        $stmt = $conn->prepare("UPDATE teacher_codes SET is_used = TRUE WHERE code_id = ?");
+        $stmt = $conn->prepare("UPDATE teacher_codes SET use_count = use_count + 1 WHERE code_id = ?");
         $stmt->execute([$code['code_id']]);
     }
 
-    // Log the registration
+    // Log registration
     logAudit($conn, $user_id, 'User registered', 'create', 'users', $user_id, "New $role account created");
 
-    // Commit transaction
     $conn->commit();
 
-    // Redirect to login with success message
-    redirectWithMessage(BASE_URL . 'auth/login.php', 'success', 'Account created successfully! Please login.');
+    // Auto-login
+    $_SESSION['user_id'] = $user_id;
+    $_SESSION['email'] = $email;
+    $_SESSION['full_name'] = $full_name;
+    $_SESSION['role'] = $role;
+    $_SESSION['last_activity'] = time();
+
+    // ✅ Redirect to dashboard
+    redirectWithMessage($redirect_success, 'success', "Account created successfully! Welcome, $full_name!");
 
 } catch (PDOException $e) {
-    // Rollback on error
     $conn->rollBack();
     error_log("Registration Error: " . $e->getMessage());
-    redirectWithMessage(BASE_URL . 'auth/register.php', 'danger', 'An error occurred during registration. Please try again.');
+    redirectWithMessage($redirect_register, 'danger', 'An error occurred during registration. Please try again.');
 }
 ?>

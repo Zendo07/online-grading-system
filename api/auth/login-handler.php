@@ -59,7 +59,7 @@ try {
     // Log the login action
     logAudit($conn, $user['user_id'], 'User logged in', 'login', 'users', $user['user_id'], 'Successful login');
     
-    // Redirect based on role
+    // ✅ Redirect based on role to their respective dashboard
     if ($user['role'] === 'teacher') {
         redirectWithMessage(BASE_URL . 'teacher/dashboard.php', 'success', 'Welcome back, ' . $user['full_name'] . '!');
     } else {
