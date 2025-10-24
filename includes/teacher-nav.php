@@ -1,5 +1,12 @@
 <?php
-// Teacher Navigation - Modern Google Classroom Style
+// includes/teacher-nav.php - FIXED VERSION
+// This file should be included on ALL teacher pages
+
+// Ensure BASE_URL is defined
+if (!defined('BASE_URL')) {
+    require_once __DIR__ . '/config.php';
+}
+
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 
@@ -11,12 +18,16 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <span class="hamburger-line"></span>
             <span class="hamburger-line"></span>
         </div>
-        <a href="dashboard.php" class="navbar-brand">IndEX</a>
+        <a href="<?php echo BASE_URL; ?>teacher/dashboard.php" class="navbar-brand">IndEX</a>
     </div>
     <div class="navbar-right">
         <div class="profile-dropdown">
-            <a href="profile.php" class="profile-button">
-                <img src="<?php echo getProfilePicture($_SESSION['profile_picture'] ?? '', $_SESSION['full_name']); ?>" alt="Profile">
+            <a href="<?php echo BASE_URL; ?>teacher/profile.php" class="profile-button">
+                <?php
+                $profile_pic = $_SESSION['profile_picture'] ?? '';
+                $full_name = $_SESSION['full_name'] ?? 'User';
+                ?>
+                <img src="<?php echo getProfilePicture($profile_pic, $full_name); ?>" alt="Profile">
             </a>
         </div>
     </div>
@@ -27,7 +38,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <div class="sidebar-content">
         <div class="sidebar-header">
             <div class="sidebar-user-info">
-                <div class="sidebar-user-name"><?php echo htmlspecialchars($_SESSION['full_name']); ?></div>
+                <div class="sidebar-user-name"><?php echo htmlspecialchars($_SESSION['full_name'] ?? 'Teacher'); ?></div>
                 <div class="sidebar-user-role">Teacher</div>
             </div>
         </div>
@@ -94,3 +105,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
 <!-- Overlay for mobile -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- Load Navigation JavaScript -->
+<script>
+// Define BASE_URL for JavaScript
+window.BASE_URL = '<?php echo BASE_URL; ?>';
+</script>
+<script src="<?php echo BASE_URL; ?>assets/js/dashboard-nav.js?v=<?php echo time(); ?>"></script>
