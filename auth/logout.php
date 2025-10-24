@@ -17,6 +17,6 @@ session_unset();
 session_destroy();
 
 // Redirect to login page
-header('Location: ' . BASE_URL . 'auth/login.php?logged_out=1');
+header('Location: ' . BASE_URL . 'index.php?logged_out=1');
 exit();
 ?>

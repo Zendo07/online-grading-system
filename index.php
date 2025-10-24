@@ -6,6 +6,13 @@ require_once 'includes/session.php';
 if (isLoggedIn()) {
     redirectToDashboard();
 }
+
+// Check for logout message
+$flash_message = $_SESSION['flash_message'] ?? null;
+if ($flash_message) {
+    unset($_SESSION['flash_message']); // remove after displaying
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -95,12 +102,9 @@ if (isLoggedIn()) {
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; <?php echo date('Y'); ?> Online Grading System. All rights reserved.</p>
-            <p>Developed for educational purposes</p>
-        </div>
-    </footer>
+    <div class="footer">
+    <p>&copy; 2025 Pampanga State University. All rights reserved.</p>
+    <a href="#">FAQs</a>
+  </div>
 </body>
 </html>

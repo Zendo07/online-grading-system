@@ -81,11 +81,18 @@ function getCurrentUser($conn) {
     return $stmt->fetch();
 }
 
-// Logout function
 function logout() {
+    session_start();
+
+    // Store flash message before clearing session
+    $_SESSION['flash_message'] = [
+        'type' => 'success',
+        'message' => 'You have been logged out successfully.'
+    ];
+
     session_unset();
     session_destroy();
-    header('Location: ' . BASE_URL . 'auth/login.php');
+
+    header('Location: ' . BASE_URL . 'index.php');
     exit();
 }
-?>

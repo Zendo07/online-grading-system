@@ -1,7 +1,5 @@
 <?php
 // includes/teacher-nav.php - FIXED VERSION
-// This file should be included on ALL teacher pages
-
 // Ensure BASE_URL is defined
 if (!defined('BASE_URL')) {
     require_once __DIR__ . '/config.php';
