@@ -24,7 +24,7 @@ if (!isValidEmail($email)) {
 
 try {
     // Check if user exists
-    $stmt = $conn->prepare("SELECT user_id, email, password, full_name, role, status FROM users WHERE email = ?");
+    $stmt = $conn->prepare("SELECT user_id, email, password, full_name, role, status, email_verified FROM users WHERE email = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch();
     
@@ -42,7 +42,20 @@ try {
         redirectWithMessage(BASE_URL . 'auth/login.php', 'danger', 'Invalid email or password.');
     }
     
-    // Password is correct - Create session
+    // ✅ NEW: Check if email is verified
+    if (!$user['email_verified']) {
+        // Store user info in session for resending verification
+        $_SESSION['pending_verification_user_id'] = $user['user_id'];
+        $_SESSION['pending_verification_email'] = $user['email'];
+        
+        redirectWithMessage(
+            BASE_URL . 'auth/verify-email.php', 
+            'warning', 
+            'Please verify your email address before logging in. A verification code has been sent to your email.'
+        );
+    }
+    
+    // Password is correct and email verified - Create session
     $_SESSION['user_id'] = $user['user_id'];
     $_SESSION['email'] = $user['email'];
     $_SESSION['full_name'] = $user['full_name'];
@@ -59,7 +72,7 @@ try {
     // Log the login action
     logAudit($conn, $user['user_id'], 'User logged in', 'login', 'users', $user['user_id'], 'Successful login');
     
-    // ✅ Redirect based on role to their respective dashboard
+    // Redirect based on role to their respective dashboard
     if ($user['role'] === 'teacher') {
         redirectWithMessage(BASE_URL . 'teacher/dashboard.php', 'success', 'Welcome back, ' . $user['full_name'] . '!');
     } else {
@@ -70,4 +83,3 @@ try {
     error_log("Login Error: " . $e->getMessage());
     redirectWithMessage(BASE_URL . 'auth/login.php', 'danger', 'An error occurred. Please try again.');
 }
-?>

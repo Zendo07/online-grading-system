@@ -1,8 +1,9 @@
 <?php
 require_once '../../includes/config.php';
 require_once '../../includes/functions.php';
+require_once '../../includes/email-config.php';
 
-session_start(); // ✅ ensure session starts for auto-login
+session_start();
 
 // Allow only POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -29,10 +30,6 @@ $program = isset($_POST['program']) ? sanitize($_POST['program']) : '';
 $redirect_register = ($role === 'teacher')
     ? BASE_URL . 'auth/teacher-register.php'
     : BASE_URL . 'auth/student-register.php';
-
-$redirect_success = ($role === 'teacher')
-    ? BASE_URL . 'teacher/dashboard.php'
-    : BASE_URL . 'student/dashboard.php';
 
 // =====================================
 // 🧩 Basic validation
@@ -65,7 +62,6 @@ if ($role === 'teacher') {
         redirectWithMessage($redirect_register, 'danger', 'Teacher invitation code is required.');
     }
 
-    // Check if code exists
     $stmt = $conn->prepare("SELECT code_id FROM teacher_codes WHERE invitation_code = ?");
     $stmt->execute([$invitation_code]);
     $code = $stmt->fetch();
@@ -74,12 +70,10 @@ if ($role === 'teacher') {
         redirectWithMessage($redirect_register, 'danger', 'Invalid invitation code.');
     }
 
-    // Check for username
     if (empty($username)) {
         redirectWithMessage($redirect_register, 'danger', 'Username is required for teachers.');
     }
 
-    // Check if username already exists
     $stmt = $conn->prepare("SELECT user_id FROM users WHERE username = ?");
     $stmt->execute([$username]);
     if ($stmt->rowCount() > 0) {
@@ -95,7 +89,6 @@ if ($role === 'student') {
         redirectWithMessage($redirect_register, 'danger', 'Student number is required.');
     }
 
-    // Prevent duplicate student number
     $stmt = $conn->prepare("SELECT user_id FROM users WHERE student_number = ?");
     $stmt->execute([$student_number]);
     if ($stmt->rowCount() > 0) {
@@ -104,7 +97,7 @@ if ($role === 'student') {
 }
 
 // =====================================
-// ✅ Database Insertion
+// ✅ Database Insertion with Email Verification
 // =====================================
 try {
     // Check if email exists
@@ -119,10 +112,10 @@ try {
 
     $conn->beginTransaction();
 
-    // Insert user
+    // Insert user (email_verified = FALSE by default)
     $stmt = $conn->prepare("
-        INSERT INTO users (email, password, full_name, role, username, contact_number, student_number, program, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active')
+        INSERT INTO users (email, password, full_name, role, username, contact_number, student_number, program, status, email_verified)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active', FALSE)
     ");
     $stmt->execute([$email, $hashed_password, $full_name, $role, $username, $contact_number, $student_number, $program]);
 
@@ -134,24 +127,44 @@ try {
         $stmt->execute([$code['code_id']]);
     }
 
+    // Generate verification code
+    $verification_code = generateVerificationCode();
+    $expires_at = date('Y-m-d H:i:s', strtotime('+' . VERIFICATION_CODE_EXPIRY . ' minutes'));
+
+    // Store verification code
+    $stmt = $conn->prepare("
+        INSERT INTO email_verifications (user_id, email, verification_code, expires_at)
+        VALUES (?, ?, ?, ?)
+    ");
+    $stmt->execute([$user_id, $email, $verification_code, $expires_at]);
+
+    // Send verification email
+    $email_sent = sendVerificationEmail($email, $full_name, $verification_code);
+
+    if (!$email_sent) {
+        $conn->rollBack();
+        error_log("Failed to send verification email to: $email");
+        redirectWithMessage($redirect_register, 'danger', 'Failed to send verification email. Please try again or contact support.');
+    }
+
     // Log registration
-    logAudit($conn, $user_id, 'User registered', 'create', 'users', $user_id, "New $role account created");
+    logAudit($conn, $user_id, 'User registered', 'create', 'users', $user_id, "New $role account created - awaiting email verification");
 
     $conn->commit();
 
-    // Auto-login
-    $_SESSION['user_id'] = $user_id;
-    $_SESSION['email'] = $email;
-    $_SESSION['full_name'] = $full_name;
-    $_SESSION['role'] = $role;
-    $_SESSION['last_activity'] = time();
+    // Store user_id in session for verification page
+    $_SESSION['pending_verification_user_id'] = $user_id;
+    $_SESSION['pending_verification_email'] = $email;
 
-    // ✅ Redirect to dashboard
-    redirectWithMessage($redirect_success, 'success', "Account created successfully! Welcome, $full_name!");
+    // Redirect to verification page
+    redirectWithMessage(
+        BASE_URL . 'auth/verify-email.php',
+        'success',
+        'Registration successful! Please check your email for the verification code.'
+    );
 
 } catch (PDOException $e) {
     $conn->rollBack();
     error_log("Registration Error: " . $e->getMessage());
     redirectWithMessage($redirect_register, 'danger', 'An error occurred during registration. Please try again.');
 }
-?>

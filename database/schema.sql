@@ -1,5 +1,4 @@
 -- Online Grading System Database Schema
--- Run this SQL file in phpMyAdmin or MySQL
 
 CREATE DATABASE IF NOT EXISTS online_grading_system;
 USE online_grading_system;
