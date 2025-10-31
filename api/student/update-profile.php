@@ -29,7 +29,7 @@ try {
     $_SESSION['full_name'] = $full_name;
     
     // Log the action
-    logAudit($conn, $user_id, 'Updated profile', 'update', 'users', $user_id, 'Updated full name');
+    logAudit($conn, $user_id, 'Updated profile', 'update', 'users', $user_id, 'Updated full name to: ' . $full_name);
     
     redirectWithMessage(BASE_URL . 'student/profile.php', 'success', 'Profile updated successfully!');
     

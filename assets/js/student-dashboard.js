@@ -1,349 +1,304 @@
 /**
- * Student Dashboard JavaScript
- * Handles animations, interactions, and dynamic updates
+ * Student Dashboard V5 - JavaScript
+ * Handles charts, animations, and dynamic updates
  */
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize dashboard features
-    initializeCardAnimations();
-    initializeAlertDismiss();
-    animateNumbers();
-    
-    // Auto-hide alerts after 5 seconds
-    setTimeout(function() {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(function(alert) {
-            fadeOut(alert);
-        });
-    }, 5000);
-});
+(function() {
+    'use strict';
 
-/**
- * Initialize card hover animations
- */
-function initializeCardAnimations() {
-    const cards = document.querySelectorAll('.card');
-    
-    cards.forEach(function(card) {
-        // Add ripple effect on click
-        card.addEventListener('click', function(e) {
-            const ripple = document.createElement('span');
-            ripple.classList.add('ripple-effect');
-            
-            const rect = card.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height);
-            const x = e.clientX - rect.left - size / 2;
-            const y = e.clientY - rect.top - size / 2;
-            
-            ripple.style.width = ripple.style.height = size + 'px';
-            ripple.style.left = x + 'px';
-            ripple.style.top = y + 'px';
-            
-            card.appendChild(ripple);
-            
-            setTimeout(function() {
-                ripple.remove();
-            }, 600);
-        });
-        
-        // Add entrance animation on scroll
-        observeCard(card);
-    });
-}
-
-/**
- * Observe cards for scroll animations
- */
-function observeCard(card) {
-    const observer = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '0';
-                entry.target.style.transform = 'translateY(20px)';
-                
-                setTimeout(function() {
-                    entry.target.style.transition = 'all 0.5s ease';
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }, 100);
-                
-                observer.unobserve(entry.target);
-            }
-        });
-    }, {
-        threshold: 0.1
-    });
-    
-    observer.observe(card);
-}
-
-/**
- * Animate numbers counting up
- */
-function animateNumbers() {
-    const numberElements = document.querySelectorAll('.card-number');
-    
-    numberElements.forEach(function(element) {
-        const text = element.textContent;
-        const hasPercent = text.includes('%');
-        const hasSuffix = text.match(/\d+(st|nd|rd|th)/);
-        
-        // Extract number
-        let finalValue = parseFloat(text);
-        
-        if (isNaN(finalValue)) return;
-        
-        // Animate from 0 to final value
-        let currentValue = 0;
-        const increment = finalValue / 50;
-        const duration = 1000; // 1 second
-        const stepTime = duration / 50;
-        
-        element.textContent = '0';
-        
-        const timer = setInterval(function() {
-            currentValue += increment;
-            
-            if (currentValue >= finalValue) {
-                currentValue = finalValue;
-                clearInterval(timer);
-            }
-            
-            // Format display
-            let displayValue;
-            if (Number.isInteger(finalValue)) {
-                displayValue = Math.floor(currentValue);
-            } else {
-                displayValue = currentValue.toFixed(1);
-            }
-            
-            // Add suffix back
-            if (hasPercent) {
-                element.textContent = displayValue + '%';
-            } else if (hasSuffix) {
-                element.textContent = displayValue + getSuffix(Math.floor(currentValue));
-            } else {
-                element.textContent = displayValue;
-            }
-        }, stepTime);
-    });
-}
-
-/**
- * Get ordinal suffix for numbers
- */
-function getSuffix(num) {
-    if (num % 10 === 1 && num % 100 !== 11) return 'st';
-    if (num % 10 === 2 && num % 100 !== 12) return 'nd';
-    if (num % 10 === 3 && num % 100 !== 13) return 'rd';
-    return 'th';
-}
-
-/**
- * Initialize alert dismiss functionality
- */
-function initializeAlertDismiss() {
-    const alerts = document.querySelectorAll('.alert');
-    
-    alerts.forEach(function(alert) {
-        // Make alert clickable to dismiss
-        alert.style.cursor = 'pointer';
-        alert.title = 'Click to dismiss';
-        
-        alert.addEventListener('click', function() {
-            fadeOut(this);
-        });
-    });
-}
-
-/**
- * Fade out element
- */
-function fadeOut(element) {
-    element.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-    element.style.opacity = '0';
-    element.style.transform = 'translateY(-10px)';
-    
-    setTimeout(function() {
-        element.style.display = 'none';
-        element.remove();
-    }, 500);
-}
-
-/**
- * Add ripple effect styles dynamically
- */
-const style = document.createElement('style');
-style.textContent = `
-    .card {
-        position: relative;
-        overflow: hidden;
+    /**
+     * Initialize dashboard on page load
+     */
+    function initDashboard() {
+        initChart();
+        animateProgressBars();
+        animateStatNumbers();
+        checkSavedProfilePicture();
+        setupProfilePictureListener();
     }
-    
-    .ripple-effect {
-        position: absolute;
-        border-radius: 50%;
-        background: rgba(123, 45, 38, 0.3);
-        transform: scale(0);
-        animation: ripple-animation 0.6s ease-out;
-        pointer-events: none;
-    }
-    
-    @keyframes ripple-animation {
-        to {
-            transform: scale(4);
-            opacity: 0;
+
+    /**
+     * Initialize Chart.js grade performance chart
+     */
+    function initChart() {
+        const canvas = document.getElementById('gradeChart');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        
+        const gradient1 = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient1.addColorStop(0, 'rgba(123, 45, 38, 0.8)');
+        gradient1.addColorStop(1, 'rgba(123, 45, 38, 0.1)');
+
+        // Get data from PHP (passed via global variable)
+        const chartData = typeof gradeHistoryData !== 'undefined' ? gradeHistoryData : [0, 0, 0, 0, 0, 0];
+        const hasData = typeof hasGrades !== 'undefined' ? hasGrades : false;
+        
+        // Determine Y-axis range based on data
+        let minY = 0;
+        let maxY = 100;
+        
+        if (hasData && chartData.some(val => val > 0)) {
+            const validData = chartData.filter(val => val > 0);
+            const minGrade = Math.min(...validData);
+            const maxGrade = Math.max(...validData);
+            minY = Math.max(0, Math.floor(minGrade / 10) * 10 - 10);
+            maxY = Math.min(100, Math.ceil(maxGrade / 10) * 10 + 10);
         }
-    }
-`;
-document.head.appendChild(style);
 
-/**
- * Update statistics in real-time (if needed)
- * Can be connected to AJAX calls for live updates
- */
-function refreshStatistics() {
-    // Placeholder for future AJAX implementation
-    console.log('Statistics refresh triggered');
-    
-    // Example AJAX call structure:
-    /*
-    fetch(window.BASE_URL + 'api/student/get-statistics.php')
-        .then(response => response.json())
-        .then(data => {
-            updateDashboardStats(data);
-        })
-        .catch(error => {
-            console.error('Error fetching statistics:', error);
-        });
-    */
-}
-
-/**
- * Update dashboard statistics
- */
-function updateDashboardStats(data) {
-    // Update each statistic card
-    const stats = {
-        'Overall Grade Average': data.overall_average,
-        'Total Subjects Enrolled': data.total_classes,
-        'Attendance Percentage': data.attendance_percentage + '%',
-        'Missing / Overdue Tasks': data.missing_tasks,
-        'Quiz Score Average': data.quiz_average,
-        'Activity Score Average': data.activity_average,
-        'Rank in Class': data.rank_display
-    };
-    
-    const cards = document.querySelectorAll('.card');
-    cards.forEach(function(card) {
-        const title = card.querySelector('h3').textContent;
-        if (stats[title]) {
-            const numberElement = card.querySelector('.card-number');
-            numberElement.textContent = stats[title];
-        }
-    });
-}
-
-/**
- * Handle button interactions
- */
-document.querySelectorAll('.btn').forEach(function(btn) {
-    btn.addEventListener('click', function(e) {
-        // Add loading state
-        const originalText = this.innerHTML;
-        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
-        this.style.pointerEvents = 'none';
-        
-        // Reset after navigation (if same page) or form submission
-        setTimeout(function() {
-            if (this.innerHTML.includes('Loading')) {
-                this.innerHTML = originalText;
-                this.style.pointerEvents = 'auto';
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+                datasets: [{
+                    label: 'Average Grade',
+                    data: chartData,
+                    backgroundColor: gradient1,
+                    borderColor: '#7b2d26',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 6,
+                    pointBackgroundColor: '#7b2d26',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: '#7b2d26',
+                        padding: 12,
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: '#f5d5c8',
+                        borderWidth: 2,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y > 0 ? 'Grade: ' + context.parsed.y + '%' : 'No data';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: minY === 0,
+                        min: minY,
+                        max: maxY,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            },
+                            color: '#666666',
+                            font: {
+                                family: 'Poppins',
+                                size: 12
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)',
+                            drawBorder: false
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#666666',
+                            font: {
+                                family: 'Poppins',
+                                size: 12
+                            }
+                        },
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        }
+                    }
+                }
             }
-        }.bind(this), 3000);
-    });
-});
-
-/**
- * Add keyboard navigation support
- */
-document.addEventListener('keydown', function(e) {
-    // Press 'G' to go to grades
-    if (e.key === 'g' || e.key === 'G') {
-        if (!e.ctrlKey && !e.altKey) {
-            const gradesLink = document.querySelector('a[href*="my-grades"]');
-            if (gradesLink) gradesLink.click();
-        }
-    }
-    
-    // Press 'J' to join class
-    if (e.key === 'j' || e.key === 'J') {
-        if (!e.ctrlKey && !e.altKey) {
-            const joinLink = document.querySelector('a[href*="join-class"]');
-            if (joinLink) joinLink.click();
-        }
-    }
-    
-    // Press 'Escape' to dismiss alerts
-    if (e.key === 'Escape') {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(function(alert) {
-            fadeOut(alert);
         });
     }
-});
 
-/**
- * Add tooltip functionality for cards
- */
-function addTooltips() {
-    const cards = document.querySelectorAll('.card');
-    
-    cards.forEach(function(card) {
-        card.addEventListener('mouseenter', function() {
-            const tooltip = document.createElement('div');
-            tooltip.className = 'card-tooltip';
-            tooltip.textContent = 'Click for more details';
-            tooltip.style.cssText = `
-                position: absolute;
-                bottom: 10px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: rgba(0, 0, 0, 0.8);
-                color: white;
-                padding: 5px 10px;
-                border-radius: 4px;
-                font-size: 12px;
-                pointer-events: none;
-                opacity: 0;
-                transition: opacity 0.3s ease;
-            `;
-            
-            this.appendChild(tooltip);
-            
-            setTimeout(function() {
-                tooltip.style.opacity = '1';
+    /**
+     * Animate progress bars
+     */
+    function animateProgressBars() {
+        const progressBars = document.querySelectorAll('.progress-bar-v5');
+        progressBars.forEach(bar => {
+            const progress = bar.getAttribute('data-progress');
+            setTimeout(() => {
+                bar.style.width = progress + '%';
             }, 100);
         });
-        
-        card.addEventListener('mouseleave', function() {
-            const tooltip = this.querySelector('.card-tooltip');
-            if (tooltip) {
-                tooltip.style.opacity = '0';
-                setTimeout(function() {
-                    tooltip.remove();
-                }, 300);
+    }
+
+    /**
+     * Animate stat numbers
+     */
+    function animateStatNumbers() {
+        const statValues = document.querySelectorAll('.stat-value-v5');
+        statValues.forEach((stat) => {
+            const text = stat.textContent.trim();
+            const hasPercent = text.includes('%');
+            
+            // Extract number from string (remove % and any non-numeric chars except .)
+            const numberMatch = text.match(/[\d.]+/);
+            if (!numberMatch) return;
+            
+            const number = parseFloat(numberMatch[0]);
+            
+            if (!isNaN(number) && number > 0) {
+                // Only animate if number is greater than 0
+                if (hasPercent) {
+                    animateValue(stat, 0, Math.round(number), 1000, true);
+                } else {
+                    animateValue(stat, 0, Math.round(number), 1000, false);
+                }
             }
         });
-    });
-}
+    }
 
-// Initialize tooltips
-setTimeout(addTooltips, 500);
+    /**
+     * Animate a number from start to end
+     */
+    function animateValue(element, start, end, duration, hasPercent = false) {
+        if (end === 0) {
+            element.textContent = hasPercent ? '0%' : '0';
+            return;
+        }
+        
+        const range = end - start;
+        const increment = range > 0 ? 1 : -1;
+        const stepTime = Math.abs(Math.floor(duration / range));
+        let current = start;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if (hasPercent) {
+                element.textContent = current + '%';
+            } else {
+                element.textContent = current;
+            }
+            
+            if (current === end) {
+                clearInterval(timer);
+            }
+        }, stepTime);
+    }
 
-/**
- * Console easter egg
- */
-console.log('%c👋 Hello Student!', 'font-size: 20px; color: #7b2d26; font-weight: bold;');
-console.log('%cWelcome to indEx Dashboard', 'font-size: 14px; color: #666;');
-console.log('%cKeyboard shortcuts: G = Grades, J = Join Class', 'font-size: 12px; color: #999;');
+    /**
+     * Check localStorage for recently updated profile picture
+     */
+    function checkSavedProfilePicture() {
+        const savedPicUrl = localStorage.getItem('profile_picture_updated');
+        if (savedPicUrl) {
+            updateProfilePicture(savedPicUrl);
+        }
+    }
+
+    /**
+     * Setup listener for profile picture updates from other tabs/windows
+     */
+    function setupProfilePictureListener() {
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'profile_picture_updated' && e.newValue) {
+                updateProfilePicture(e.newValue);
+            }
+        });
+    }
+
+    /**
+     * Update profile picture element
+     */
+    function updateProfilePicture(pictureUrl) {
+        const dashboardPic = document.getElementById('dashboardProfilePic');
+        if (dashboardPic) {
+            dashboardPic.style.opacity = '0';
+            setTimeout(() => {
+                dashboardPic.src = pictureUrl + '?t=' + new Date().getTime();
+                dashboardPic.style.transition = 'opacity 0.3s ease';
+                dashboardPic.style.opacity = '1';
+            }, 50);
+        }
+        
+        // Also update navbar profile if exists
+        const navbarProfileImg = document.querySelector('.profile-button img');
+        if (navbarProfileImg) {
+            navbarProfileImg.src = pictureUrl + '?t=' + new Date().getTime();
+        }
+    }
+
+    /**
+     * Add smooth scroll behavior
+     */
+    function setupSmoothScroll() {
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    }
+
+    /**
+     * Card animation on scroll
+     */
+    function setupScrollAnimations() {
+        const cards = document.querySelectorAll('.stat-card-v5, .chart-card-v5');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '0';
+                    entry.target.style.transform = 'translateY(20px)';
+                    
+                    setTimeout(() => {
+                        entry.target.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }, 100);
+                    
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+        
+        cards.forEach(card => {
+            observer.observe(card);
+        });
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            initDashboard();
+            setupSmoothScroll();
+            setupScrollAnimations();
+        });
+    } else {
+        initDashboard();
+        setupSmoothScroll();
+        setupScrollAnimations();
+    }
+
+    // Export functions for global use
+    window.DashboardV5 = {
+        updateProfilePicture: updateProfilePicture,
+        animateProgressBars: animateProgressBars
+    };
+
+})();

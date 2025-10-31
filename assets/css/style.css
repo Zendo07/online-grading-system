@@ -20,7 +20,7 @@
     --info-color: #3b82f6;
     --dark-color: #2B1F1F;
     --dark-maroon: #5C3030;
-    --light-color: #f8f5f2;
+    --light-color: #FFE5C4; /* Light Peach */
     --white-color: #ffffff;
     --cream-color: #F5E6D3;
     --border-color: #e5d5c5;
@@ -389,8 +389,13 @@ a:hover {
 .text-warning { color: var(--warning-color); }
 .text-muted { color: var(--text-light); }
 
-.bg-white { background-color: var(--white-color); }
-.bg-light { background-color: var(--light-color); }
+.bg-white { 
+  background-color: #FFE5D9; /* light peach */
+}
+
+.bg-light { 
+  background-color: #FFE5D9; /* same light peach or choose lighter */
+}
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -402,3 +407,4 @@ a:hover {
         padding: 0 15px;
     }
 }
+

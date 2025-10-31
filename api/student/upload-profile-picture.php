@@ -6,112 +6,58 @@ require_once '../../includes/functions.php';
 // Require student access
 requireStudent();
 
-// Only allow POST requests
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: ' . BASE_URL . 'student/profile.php');
+header('Content-Type: application/json');
+
+// Check if file was uploaded
+if (!isset($_FILES['profile_picture'])) {
+    echo json_encode(['success' => false, 'message' => 'No file uploaded']);
     exit();
 }
 
-$full_name = sanitize($_POST['full_name']);
 $user_id = $_SESSION['user_id'];
+$file = $_FILES['profile_picture'];
 
-// Validate input
-if (empty($full_name)) {
-    redirectWithMessage(BASE_URL . 'student/profile.php', 'danger', 'Full name is required.');
-}
+// Upload profile picture
+$result = uploadProfilePicture($file, $user_id);
 
-try {
-    // Handle profile picture upload
-    $profile_picture_path = null;
-    $update_picture = false;
-    
-    if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
-        $file = $_FILES['profile_picture'];
+if ($result['success']) {
+    try {
+        // Delete old profile picture if exists
+        $stmt = $conn->prepare("SELECT profile_picture FROM users WHERE user_id = ?");
+        $stmt->execute([$user_id]);
+        $old_pic = $stmt->fetchColumn();
         
-        // Validate file type
-        $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $file_type = finfo_file($finfo, $file['tmp_name']);
-        finfo_close($finfo);
-        
-        if (!in_array($file_type, $allowed_types)) {
-            redirectWithMessage(BASE_URL . 'student/profile.php', 'danger', 'Invalid file type. Only JPG, PNG, and GIF are allowed.');
-        }
-        
-        // Validate file size (5MB max)
-        $max_size = 5 * 1024 * 1024; // 5MB in bytes
-        if ($file['size'] > $max_size) {
-            redirectWithMessage(BASE_URL . 'student/profile.php', 'danger', 'File size must be less than 5MB.');
-        }
-        
-        // Create uploads directory if it doesn't exist
-        $upload_dir = '../../uploads/profiles/';
-        if (!file_exists($upload_dir)) {
-            if (!mkdir($upload_dir, 0755, true)) {
-                redirectWithMessage(BASE_URL . 'student/profile.php', 'danger', 'Failed to create upload directory.');
+        if ($old_pic && $old_pic !== $result['filename']) {
+            $old_path = __DIR__ . '/../../uploads/profiles/' . $old_pic;
+            if (file_exists($old_path)) {
+                @unlink($old_path);
             }
         }
         
-        // Generate unique filename
-        $file_extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        $new_filename = 'profile_' . $user_id . '_' . time() . '.' . $file_extension;
-        $upload_path = $upload_dir . $new_filename;
+        // Update database
+        $stmt = $conn->prepare("UPDATE users SET profile_picture = ? WHERE user_id = ?");
+        $stmt->execute([$result['filename'], $user_id]);
         
-        // Move uploaded file
-        if (move_uploaded_file($file['tmp_name'], $upload_path)) {
-            $profile_picture_path = 'uploads/profiles/' . $new_filename;
-            $update_picture = true;
-            
-            // Delete old profile picture if exists
-            $stmt = $conn->prepare("SELECT profile_picture FROM users WHERE user_id = ?");
-            $stmt->execute([$user_id]);
-            $result = $stmt->fetch();
-            
-            if ($result && $result['profile_picture']) {
-                $old_picture = $result['profile_picture'];
-                $old_file_path = '../../' . $old_picture;
-                if (file_exists($old_file_path) && is_file($old_file_path)) {
-                    @unlink($old_file_path);
-                }
-            }
-        } else {
-            $error_msg = 'Failed to upload profile picture. ';
-            if (!is_writable($upload_dir)) {
-                $error_msg .= 'Upload directory is not writable.';
-            }
-            redirectWithMessage(BASE_URL . 'student/profile.php', 'danger', $error_msg);
-        }
-    }
-    
-    // Update profile in database
-    if ($update_picture) {
-        $stmt = $conn->prepare("UPDATE users SET full_name = ?, profile_picture = ? WHERE user_id = ?");
-        $stmt->execute([$full_name, $profile_picture_path, $user_id]);
+        // UPDATE SESSION IMMEDIATELY
+        $_SESSION['profile_picture'] = $result['filename'];
         
-        // Update session with new profile picture
-        $_SESSION['profile_picture'] = $profile_picture_path;
-    } else {
-        $stmt = $conn->prepare("UPDATE users SET full_name = ? WHERE user_id = ?");
-        $stmt->execute([$full_name, $user_id]);
+        // Log action
+        logAudit($conn, $user_id, 'Updated profile picture', 'update', 'users', $user_id, 'Changed profile picture');
+        
+        // Return full URL with cache buster
+        $picture_url = BASE_URL . 'uploads/profiles/' . $result['filename'] . '?t=' . time();
+        
+        echo json_encode([
+            'success' => true,
+            'message' => 'Profile picture updated successfully',
+            'filename' => $result['filename'],
+            'picture_url' => $picture_url
+        ]);
+    } catch (PDOException $e) {
+        error_log("Upload Profile Picture Error: " . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
     }
-    
-    // Update session with new name
-    $_SESSION['full_name'] = $full_name;
-    
-    // Log the action
-    $description = 'Updated full name';
-    if ($update_picture) {
-        $description .= ' and profile picture';
-    }
-    logAudit($conn, $user_id, 'Updated profile', 'update', 'users', $user_id, $description);
-    
-    redirectWithMessage(BASE_URL . 'student/profile.php', 'success', 'Profile updated successfully!');
-    
-} catch (PDOException $e) {
-    error_log("Update Profile Error: " . $e->getMessage());
-    redirectWithMessage(BASE_URL . 'student/profile.php', 'danger', 'An error occurred. Please try again.');
-} catch (Exception $e) {
-    error_log("Update Profile Error: " . $e->getMessage());
-    redirectWithMessage(BASE_URL . 'student/profile.php', 'danger', 'An error occurred. Please try again.');
+} else {
+    echo json_encode($result);
 }
 ?>
