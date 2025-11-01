@@ -1,5 +1,5 @@
-// student/dashboard.php
 <?php
+// student/dashboard.php
 require_once '../includes/config.php';
 require_once '../includes/session.php';
 require_once '../includes/functions.php';
@@ -181,9 +181,16 @@ $flash = getFlashMessage();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="user-id" content="<?php echo htmlspecialchars($student_id); ?>">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="description" content="Student Dashboard - indEx Online Grading System">
     <title>Student Dashboard - indEx</title>
+    
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="<?php echo CSS_PATH; ?>style.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="<?php echo CSS_PATH; ?>navigation.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="<?php echo CSS_PATH; ?>dashboard.css?v=<?php echo time(); ?>">
@@ -196,7 +203,7 @@ $flash = getFlashMessage();
         <div class="main-content">
             <div class="dashboard-content-v5">
                 <?php if ($flash): ?>
-                    <div class="alert alert-<?php echo $flash['type']; ?>">
+                    <div class="alert alert-<?php echo htmlspecialchars($flash['type']); ?>">
                         <?php echo htmlspecialchars($flash['message']); ?>
                     </div>
                 <?php endif; ?>
@@ -228,25 +235,25 @@ $flash = getFlashMessage();
                         <div class="stat-card-v5">
                             <div class="stat-icon-v5"><i class="fas fa-book"></i></div>
                             <div class="stat-label-v5">Active Courses</div>
-                            <div class="stat-value-v5"><?php echo $active_courses; ?></div>
+                            <div class="stat-value-v5" id="activeCourses"><?php echo $active_courses; ?></div>
                         </div>
 
                         <div class="stat-card-v5">
                             <div class="stat-icon-v5"><i class="fas fa-star"></i></div>
                             <div class="stat-label-v5">Overall GPA</div>
-                            <div class="stat-value-v5"><?php echo number_format($gpa, 1); ?>%</div>
+                            <div class="stat-value-v5" id="gpaValue"><?php echo number_format($gpa, 1); ?>%</div>
                         </div>
 
                         <div class="stat-card-v5">
                             <div class="stat-icon-v5"><i class="fas fa-check-circle"></i></div>
                             <div class="stat-label-v5">Attendance</div>
-                            <div class="stat-value-v5"><?php echo $attendance_percentage; ?>%</div>
+                            <div class="stat-value-v5" id="attendancePercent"><?php echo $attendance_percentage; ?>%</div>
                         </div>
 
                         <div class="stat-card-v5">
                             <div class="stat-icon-v5"><i class="fas fa-file-alt"></i></div>
                             <div class="stat-label-v5">Missing Submissions</div>
-                            <div class="stat-value-v5"><?php echo $missing_submissions; ?></div>
+                            <div class="stat-value-v5" id="pendingTasks"><?php echo $missing_submissions; ?></div>
                         </div>
                     </div>
                 </section>
@@ -351,12 +358,15 @@ $flash = getFlashMessage();
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <script src="<?php echo JS_PATH; ?>main.js?v=<?php echo time(); ?>"></script>
     <script>
+        window.BASE_URL = '<?php echo BASE_URL; ?>';
+        window.CURRENT_USER_ID = '<?php echo $student_id; ?>';
         const gradeHistoryData = <?php echo json_encode($grade_history); ?>;
         const hasGrades = <?php echo $gpa > 0 ? 'true' : 'false'; ?>;
     </script>
+    <script src="<?php echo JS_PATH; ?>main.js?v=<?php echo time(); ?>"></script>
     <script src="<?php echo JS_PATH; ?>student-dashboard.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

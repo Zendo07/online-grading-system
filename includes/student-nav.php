@@ -121,17 +121,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     </a>
                 </li>
                 
-                <li class="nav-item password">
-                    <a href="<?php echo BASE_URL; ?>student/change-password.php" class="<?php echo $current_page == 'change-password.php' ? 'active' : ''; ?>">
-                        <span class="nav-icon">
-                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                            </svg>
-                        </span>
-                        <span class="nav-text">Change Password</span>
-                    </a>
-                </li>
                 
                 <li class="nav-item logout">
                     <a href="<?php echo BASE_URL; ?>auth/logout.php" onclick="return confirm('Are you sure you want to logout?');">

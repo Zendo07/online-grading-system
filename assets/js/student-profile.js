@@ -1,212 +1,336 @@
 /**
- * Student Profile Page - Interactive Functionality
+ * Student Profile - Identity-Focused Minimal Design
+ * Clean, simple interactions for profile management
  */
 
 (function() {
     'use strict';
 
     /**
-     * Initialize profile page on DOM load
+     * Initialize profile functionality
      */
     function initProfile() {
-        setupTabNavigation();
-        setupAnimations();
+        setupProfilePictureUpload();
+        setupFlashMessages();
+        setupButtonAnimations();
+        addNotificationStyles();
     }
 
     /**
-     * Setup tab navigation functionality
+     * Setup profile picture upload functionality
      */
-    function setupTabNavigation() {
-        const tabButtons = document.querySelectorAll('.tab-button');
-        const tabContents = document.querySelectorAll('.tab-content');
-
-        tabButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const tabName = this.getAttribute('data-tab');
-
-                // Remove active class from all buttons and contents
-                tabButtons.forEach(btn => btn.classList.remove('active'));
-                tabContents.forEach(content => content.classList.remove('active'));
-
-                // Add active class to clicked button and corresponding content
-                this.classList.add('active');
-                const activeContent = document.getElementById(`tab-${tabName}`);
-                if (activeContent) {
-                    activeContent.classList.add('active');
-                }
-
-                // Log tab change for analytics (optional)
-                console.log(`Switched to: ${tabName} tab`);
-            });
-        });
-    }
-
-    /**
-     * Setup smooth animations for elements
-     */
-    function setupAnimations() {
-        // Add intersection observer for scroll animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver(function(entries) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.animation = entry.target.getAttribute('data-animation') || 'fadeIn 0.5s ease';
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, observerOptions);
-
-        // Observe overview items
-        const overviewItems = document.querySelectorAll('.overview-item');
-        overviewItems.forEach((item, index) => {
-            item.style.opacity = '0';
-            item.style.animationDelay = `${index * 100}ms`;
-            observer.observe(item);
-        });
-
-        // Observe help items
-        const helpItems = document.querySelectorAll('.help-item');
-        helpItems.forEach((item, index) => {
-            item.style.opacity = '0';
-            item.style.animationDelay = `${index * 100}ms`;
-            observer.observe(item);
-        });
-
-        // Observe setting items
-        const settingItems = document.querySelectorAll('.setting-item');
-        settingItems.forEach((item, index) => {
-            item.style.opacity = '0';
-            item.style.animationDelay = `${index * 100}ms`;
-            observer.observe(item);
-        });
-    }
-
-    /**
-     * Handle profile image preview (for future use)
-     */
-    function setupProfileImagePreview() {
-        const profileImage = document.getElementById('profileImage');
-        const changePhotoBtn = document.querySelector('.btn-change-photo');
-
-        if (changePhotoBtn && !changePhotoBtn.disabled) {
-            changePhotoBtn.addEventListener('click', function(e) {
+    function setupProfilePictureUpload() {
+        const uploadBtn = document.querySelector('.btn-change-photo');
+        
+        if (uploadBtn && !uploadBtn.disabled) {
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/jpeg,image/png,image/jpg';
+            fileInput.style.display = 'none';
+            fileInput.id = 'profilePictureInput';
+            document.body.appendChild(fileInput);
+            
+            uploadBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                // Future implementation for profile photo change
-                console.log('Profile photo change will be implemented');
+                fileInput.click();
+            });
+            
+            fileInput.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    
+                    // Validate file size (max 5MB)
+                    if (file.size > 5 * 1024 * 1024) {
+                        showNotification('File Too Large', 'File size must be less than 5MB', 'error');
+                        return;
+                    }
+                    
+                    // Validate file type
+                    if (!file.type.match('image/(jpeg|jpg|png)')) {
+                        showNotification('Invalid File', 'Only JPG, JPEG, and PNG files are allowed', 'error');
+                        return;
+                    }
+                    
+                    uploadProfilePicture(file);
+                }
             });
         }
     }
 
     /**
-     * Smooth scroll to element
+     * Upload profile picture via AJAX
      */
-    function smoothScroll(element) {
-        if (element) {
-            element.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    }
-
-    /**
-     * Handle responsive tab behavior
-     */
-    function handleResponsiveTabs() {
-        const tabsContainer = document.querySelector('.profile-tabs');
-        const tabButtons = document.querySelectorAll('.tab-button');
-
-        if (window.innerWidth <= 768) {
-            // Mobile adjustments if needed
-            console.log('Mobile view - tabs adjusted');
-        }
-    }
-
-    /**
-     * Setup click handlers for overview links
-     */
-    function setupOverviewLinks() {
-        const overviewLinks = document.querySelectorAll('.overview-link');
-
-        overviewLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                // Log click analytics (optional)
-                const linkText = this.textContent;
-                console.log(`Clicked: ${linkText.trim()}`);
-            });
-        });
-    }
-
-    /**
-     * Monitor window resize for responsive behavior
-     */
-    function setupResizeListener() {
-        let resizeTimer;
-        window.addEventListener('resize', function() {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(function() {
-                handleResponsiveTabs();
-            }, 250);
-        });
-    }
-
-    /**
-     * Add keyboard navigation support
-     */
-    function setupKeyboardNavigation() {
-        document.addEventListener('keydown', function(e) {
-            const tabButtons = document.querySelectorAll('.tab-button');
-            const activeButton = document.querySelector('.tab-button.active');
-            const activeIndex = Array.from(tabButtons).indexOf(activeButton);
-
-            // Arrow keys to navigate tabs
-            if (e.key === 'ArrowRight' && activeIndex < tabButtons.length - 1) {
-                tabButtons[activeIndex + 1].click();
-                tabButtons[activeIndex + 1].focus();
-            } else if (e.key === 'ArrowLeft' && activeIndex > 0) {
-                tabButtons[activeIndex - 1].click();
-                tabButtons[activeIndex - 1].focus();
+    function uploadProfilePicture(file) {
+        const formData = new FormData();
+        formData.append('profile_picture', file);
+        
+        const uploadBtn = document.querySelector('.btn-change-photo');
+        const originalHTML = uploadBtn.innerHTML;
+        
+        uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+        uploadBtn.disabled = true;
+        uploadBtn.style.cursor = 'not-allowed';
+        
+        fetch(window.BASE_URL + 'api/student/upload-profile-picture.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const timestamp = new Date().getTime();
+                
+                // Update main profile picture with smooth transition
+                const profileImg = document.getElementById('profileImage');
+                if (profileImg) {
+                    profileImg.style.transition = 'opacity 0.5s ease';
+                    profileImg.style.opacity = '0';
+                    setTimeout(() => {
+                        profileImg.src = data.picture_url + '&cache=' + timestamp;
+                        profileImg.style.opacity = '1';
+                    }, 500);
+                }
+                
+                // Update navbar profile picture
+                const navbarImg = document.querySelector('.profile-button img');
+                if (navbarImg) {
+                    navbarImg.src = data.picture_url + '&cache=' + timestamp;
+                }
+                
+                // Update sidebar profile picture if exists
+                const sidebarImg = document.querySelector('.sidebar-user-avatar img');
+                if (sidebarImg) {
+                    sidebarImg.src = data.picture_url + '&cache=' + timestamp;
+                }
+                
+                showNotification('Success!', 'Profile picture updated successfully', 'success');
+            } else {
+                showNotification('Upload Failed', data.message || 'Failed to upload profile picture', 'error');
             }
+        })
+        .catch(error => {
+            console.error('Upload error:', error);
+            showNotification('Error', 'An error occurred while uploading. Please try again.', 'error');
+        })
+        .finally(() => {
+            uploadBtn.innerHTML = originalHTML;
+            uploadBtn.disabled = false;
+            uploadBtn.style.cursor = 'pointer';
         });
     }
 
     /**
-     * Auto-dismiss alerts
+     * Show notification toast
      */
-    function setupAlertDismissal() {
+    function showNotification(title, message, type) {
+        const existingNotifications = document.querySelectorAll('.profile-notification');
+        existingNotifications.forEach(notif => notif.remove());
+        
+        const notification = document.createElement('div');
+        notification.className = `profile-notification profile-notification-${type}`;
+        
+        const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+        
+        notification.innerHTML = `
+            <div class="notification-icon">
+                <i class="fas ${icon}"></i>
+            </div>
+            <div class="notification-content">
+                <strong class="notification-title">${title}</strong>
+                <p class="notification-message">${message}</p>
+            </div>
+            <button class="notification-close" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => notification.classList.add('show'), 10);
+        
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 5000);
+    }
+
+    /**
+     * Add notification styles dynamically
+     */
+    function addNotificationStyles() {
+        if (!document.getElementById('profile-notification-styles')) {
+            const style = document.createElement('style');
+            style.id = 'profile-notification-styles';
+            style.textContent = `
+                .profile-notification {
+                    position: fixed;
+                    top: 24px;
+                    right: 24px;
+                    min-width: 350px;
+                    max-width: 420px;
+                    padding: 20px;
+                    background: white;
+                    border-radius: 16px;
+                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+                    z-index: 10000;
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 16px;
+                    transform: translateX(500px);
+                    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+                    border-left: 4px solid;
+                }
+                
+                .profile-notification.show {
+                    transform: translateX(0);
+                }
+                
+                .profile-notification-success {
+                    border-left-color: #10b981;
+                }
+                
+                .profile-notification-error {
+                    border-left-color: #ef4444;
+                }
+                
+                .notification-icon {
+                    width: 44px;
+                    height: 44px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 50%;
+                    flex-shrink: 0;
+                    font-size: 22px;
+                }
+                
+                .profile-notification-success .notification-icon {
+                    background: rgba(16, 185, 129, 0.15);
+                    color: #10b981;
+                }
+                
+                .profile-notification-error .notification-icon {
+                    background: rgba(239, 68, 68, 0.15);
+                    color: #ef4444;
+                }
+                
+                .notification-content {
+                    flex: 1;
+                }
+                
+                .notification-title {
+                    display: block;
+                    margin-bottom: 6px;
+                    color: #1f2937;
+                    font-size: 16px;
+                    font-weight: 700;
+                }
+                
+                .notification-message {
+                    margin: 0;
+                    color: #6b7280;
+                    font-size: 14px;
+                    line-height: 1.5;
+                }
+                
+                .notification-close {
+                    width: 28px;
+                    height: 28px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: transparent;
+                    border: none;
+                    color: #9ca3af;
+                    cursor: pointer;
+                    border-radius: 8px;
+                    transition: all 0.2s ease;
+                    flex-shrink: 0;
+                }
+                
+                .notification-close:hover {
+                    background: rgba(0, 0, 0, 0.05);
+                    color: #1f2937;
+                }
+                
+                @media (max-width: 768px) {
+                    .profile-notification {
+                        top: 16px;
+                        right: 16px;
+                        left: 16px;
+                        min-width: auto;
+                        max-width: none;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+
+    /**
+     * Auto-dismiss flash messages with smooth animation
+     */
+    function setupFlashMessages() {
         const alerts = document.querySelectorAll('.alert');
+        
         alerts.forEach(alert => {
+            if (!alert.querySelector('.alert-close')) {
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'alert-close';
+                closeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                closeBtn.style.cssText = `
+                    background: none;
+                    border: none;
+                    color: inherit;
+                    cursor: pointer;
+                    padding: 0;
+                    margin-left: auto;
+                    opacity: 0.7;
+                    transition: opacity 0.2s;
+                    font-size: 16px;
+                `;
+                closeBtn.onmouseover = () => closeBtn.style.opacity = '1';
+                closeBtn.onmouseout = () => closeBtn.style.opacity = '0.7';
+                closeBtn.onclick = function() {
+                    alert.style.transform = 'translateX(500px)';
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 300);
+                };
+                alert.appendChild(closeBtn);
+            }
+            
             setTimeout(() => {
-                alert.style.transition = 'opacity 0.5s ease';
+                alert.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+                alert.style.transform = 'translateX(500px)';
                 alert.style.opacity = '0';
-                setTimeout(() => {
-                    alert.remove();
-                }, 500);
+                setTimeout(() => alert.remove(), 500);
             }, 5000);
         });
     }
 
     /**
-     * Setup tab button focus styles for accessibility
+     * Setup button hover animations
      */
-    function setupA11y() {
-        const tabButtons = document.querySelectorAll('.tab-button');
+    function setupButtonAnimations() {
+        const buttons = document.querySelectorAll('.action-button-compact');
+        
+        buttons.forEach((button, index) => {
+            // Staggered fade-in animation
+            button.style.opacity = '0';
+            button.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                button.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                button.style.opacity = '1';
+                button.style.transform = 'translateY(0)';
+            }, 200 * (index + 1));
 
-        tabButtons.forEach(button => {
-            button.setAttribute('role', 'tab');
-            button.setAttribute('tabindex', '0');
-
-            button.addEventListener('focus', function() {
-                this.style.outline = '2px solid var(--maroon)';
-                this.style.outlineOffset = '-2px';
-            });
-
-            button.addEventListener('blur', function() {
-                this.style.outline = 'none';
+            // Add keyboard support
+            button.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.click();
+                }
             });
         });
     }
@@ -215,31 +339,16 @@
      * Initialize when DOM is ready
      */
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            initProfile();
-            setupProfileImagePreview();
-            setupOverviewLinks();
-            setupResizeListener();
-            setupKeyboardNavigation();
-            setupAlertDismissal();
-            setupA11y();
-        });
+        document.addEventListener('DOMContentLoaded', initProfile);
     } else {
         initProfile();
-        setupProfileImagePreview();
-        setupOverviewLinks();
-        setupResizeListener();
-        setupKeyboardNavigation();
-        setupAlertDismissal();
-        setupA11y();
     }
 
     /**
      * Export for global use
      */
     window.StudentProfile = {
-        smoothScroll,
-        handleResponsiveTabs
+        showNotification: showNotification
     };
 
 })();

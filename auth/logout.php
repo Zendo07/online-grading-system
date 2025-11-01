@@ -1,22 +1,35 @@
 <?php
+// auth/logout.php
+session_start();
 require_once '../includes/config.php';
-require_once '../includes/functions.php';
 
-// Log the logout if user is logged in
-if (isset($_SESSION['user_id'])) {
-    logAudit($conn, $_SESSION['user_id'], 'User logged out', 'logout', 'users', $_SESSION['user_id'], 'User logged out');
-}
-
-// Clear remember me cookie
-if (isset($_COOKIE['remember_token'])) {
-    setcookie('remember_token', '', time() - 3600, '/');
-}
-
-// Destroy session
-session_unset();
+// Clear session
 session_destroy();
 
-// Redirect to login page
-header('Location: ' . BASE_URL . 'index.php?logged_out=1');
-exit();
 ?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Logging out...</title>
+    <script>
+        // Clear all profile data from localStorage on logout
+        (function() {
+            const keys = Object.keys(localStorage);
+            keys.forEach(key => {
+                if (key.startsWith('profile_') || key === 'current_user_id') {
+                    localStorage.removeItem(key);
+                }
+            });
+            
+            // Also clear sessionStorage
+            sessionStorage.clear();
+            
+            // Redirect to login
+            window.location.href = '<?php echo BASE_URL; ?>auth/login.php';
+        })();
+    </script>
+</head>
+<body>
+    <p>Logging out...</p>
+</body>
+</html>

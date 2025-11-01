@@ -20,7 +20,9 @@
         animateProgressBars();
         animateStatNumbers();
         checkSavedProfilePicture();
+        checkSavedProfileName();
         setupProfilePictureListener();
+        setupProfileNameListener();
         setupRealtimeUpdates();
     }
 
@@ -327,8 +329,39 @@
      */
     function checkSavedProfilePicture() {
         const savedPicUrl = localStorage.getItem('profile_picture_updated');
-        if (savedPicUrl) {
-            updateProfilePicture(savedPicUrl);
+        const timestamp = localStorage.getItem('profile_picture_timestamp');
+        
+        // Only use cached picture if updated within last 5 minutes
+        if (savedPicUrl && timestamp) {
+            const ageMinutes = (Date.now() - parseInt(timestamp)) / 60000;
+            if (ageMinutes < 5) {
+                updateProfilePicture(savedPicUrl);
+            } else {
+                // Clean up old cache
+                localStorage.removeItem('profile_picture_updated');
+                localStorage.removeItem('profile_picture_timestamp');
+            }
+        }
+    }
+
+    /**
+     * Check localStorage for recently updated profile name
+     */
+    function checkSavedProfileName() {
+        const savedName = localStorage.getItem('profile_name_updated');
+        const timestamp = localStorage.getItem('profile_update_timestamp');
+        
+        // Only use cached name if updated within last 5 minutes
+        if (savedName && timestamp) {
+            const ageMinutes = (Date.now() - parseInt(timestamp)) / 60000;
+            if (ageMinutes < 5) {
+                updateProfileName(savedName);
+                // Don't remove - let it persist for multiple page visits
+            } else {
+                // Clean up old cache
+                localStorage.removeItem('profile_name_updated');
+                localStorage.removeItem('profile_update_timestamp');
+            }
         }
     }
 
@@ -339,6 +372,17 @@
         window.addEventListener('storage', function(e) {
             if (e.key === 'profile_picture_updated' && e.newValue) {
                 updateProfilePicture(e.newValue);
+            }
+        });
+    }
+
+    /**
+     * Setup listener for profile name updates from settings page
+     */
+    function setupProfileNameListener() {
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'profile_name_updated' && e.newValue) {
+                updateProfileName(e.newValue);
             }
         });
     }
@@ -360,6 +404,35 @@
         const navbarProfileImg = document.querySelector('.profile-button img');
         if (navbarProfileImg) {
             navbarProfileImg.src = pictureUrl + '?t=' + new Date().getTime();
+        }
+    }
+
+    /**
+     * Update profile name in dashboard and navbar
+     */
+    function updateProfileName(newName) {
+        // Update welcome section heading
+        const welcomeTitle = document.querySelector('.welcome-text-v5 h1');
+        if (welcomeTitle) {
+            // Extract first name from full name
+            const firstName = newName.split(' ')[0];
+            welcomeTitle.style.opacity = '0';
+            setTimeout(() => {
+                welcomeTitle.textContent = `Welcome Back, ${firstName}!`;
+                welcomeTitle.style.transition = 'opacity 0.5s ease';
+                welcomeTitle.style.opacity = '1';
+            }, 200);
+        }
+        
+        // Update sidebar user name
+        const sidebarName = document.querySelector('.sidebar-user-name');
+        if (sidebarName) {
+            sidebarName.style.opacity = '0';
+            setTimeout(() => {
+                sidebarName.textContent = newName;
+                sidebarName.style.transition = 'opacity 0.5s ease';
+                sidebarName.style.opacity = '1';
+            }, 200);
         }
     }
 
@@ -426,6 +499,7 @@
     // Export functions for global use
     window.DashboardV6 = {
         updateProfilePicture,
+        updateProfileName,
         animateProgressBars,
         refreshDashboard: fetchDashboardUpdates
     };
