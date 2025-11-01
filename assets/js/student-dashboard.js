@@ -1,10 +1,16 @@
 /**
- * Student Dashboard V5 - JavaScript
- * Handles charts, animations, and dynamic updates
+ * Student Dashboard V6 - JavaScript
+ * Handles charts, animations, and realtime updates
  */
 
 (function() {
     'use strict';
+
+    // Configuration
+    const CHART_ID = 'gradeChart';
+    const UPDATE_INTERVAL = 30000; // Poll every 30 seconds
+    let chartInstance = null;
+    let updateInterval = null;
 
     /**
      * Initialize dashboard on page load
@@ -15,13 +21,14 @@
         animateStatNumbers();
         checkSavedProfilePicture();
         setupProfilePictureListener();
+        setupRealtimeUpdates();
     }
 
     /**
      * Initialize Chart.js grade performance chart
      */
     function initChart() {
-        const canvas = document.getElementById('gradeChart');
+        const canvas = document.getElementById(CHART_ID);
         if (!canvas) return;
 
         const ctx = canvas.getContext('2d');
@@ -30,11 +37,9 @@
         gradient1.addColorStop(0, 'rgba(123, 45, 38, 0.8)');
         gradient1.addColorStop(1, 'rgba(123, 45, 38, 0.1)');
 
-        // Get data from PHP (passed via global variable)
         const chartData = typeof gradeHistoryData !== 'undefined' ? gradeHistoryData : [0, 0, 0, 0, 0, 0];
         const hasData = typeof hasGrades !== 'undefined' ? hasGrades : false;
         
-        // Determine Y-axis range based on data
         let minY = 0;
         let maxY = 100;
         
@@ -46,7 +51,7 @@
             maxY = Math.min(100, Math.ceil(maxGrade / 10) * 10 + 10);
         }
 
-        new Chart(ctx, {
+        chartInstance = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
@@ -69,9 +74,7 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        display: false
-                    },
+                    legend: { display: false },
                     tooltip: {
                         backgroundColor: '#7b2d26',
                         padding: 12,
@@ -93,14 +96,9 @@
                         min: minY,
                         max: maxY,
                         ticks: {
-                            callback: function(value) {
-                                return value + '%';
-                            },
+                            callback: function(value) { return value + '%'; },
                             color: '#666666',
-                            font: {
-                                family: 'Poppins',
-                                size: 12
-                            }
+                            font: { family: 'Poppins', size: 12 }
                         },
                         grid: {
                             color: 'rgba(0, 0, 0, 0.05)',
@@ -110,19 +108,159 @@
                     x: {
                         ticks: {
                             color: '#666666',
-                            font: {
-                                family: 'Poppins',
-                                size: 12
-                            }
+                            font: { family: 'Poppins', size: 12 }
                         },
-                        grid: {
-                            display: false,
-                            drawBorder: false
-                        }
+                        grid: { display: false, drawBorder: false }
                     }
                 }
             }
         });
+    }
+
+    /**
+     * Setup realtime updates from teacher dashboard
+     */
+    function setupRealtimeUpdates() {
+        // Poll for updates every UPDATE_INTERVAL
+        updateInterval = setInterval(function() {
+            fetchDashboardUpdates();
+        }, UPDATE_INTERVAL);
+    }
+
+    /**
+     * Fetch updated dashboard data from server
+     */
+    function fetchDashboardUpdates() {
+        fetch(window.BASE_URL + 'api/student/get-dashboard-updates.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateDashboardStats(data);
+                    updateRecentActivities(data.recent_activities);
+                }
+            })
+            .catch(error => console.error('Update fetch error:', error));
+    }
+
+    /**
+     * Update dashboard statistics
+     */
+    function updateDashboardStats(data) {
+        // Update stat cards
+        updateStatCard('activeCourses', data.active_courses);
+        updateStatCard('gpaValue', data.gpa.toFixed(1) + '%');
+        updateStatCard('attendancePercent', data.attendance_percentage + '%');
+        updateStatCard('pendingTasks', data.missing_submissions);
+
+        // Update subject performance
+        if (data.subject_performance && data.subject_performance.length > 0) {
+            updateSubjectPerformance(data.subject_performance);
+        }
+
+        // Update grade chart
+        if (data.grade_history && chartInstance) {
+            chartInstance.data.datasets[0].data = data.grade_history;
+            chartInstance.update('none');
+        }
+    }
+
+    /**
+     * Update a stat card value
+     */
+    function updateStatCard(elementId, value) {
+        const element = document.getElementById(elementId);
+        if (!element || element.textContent === value) return;
+
+        element.style.opacity = '0.5';
+        element.textContent = value;
+        
+        setTimeout(() => {
+            element.style.transition = 'opacity 0.3s ease';
+            element.style.opacity = '1';
+        }, 100);
+    }
+
+    /**
+     * Update subject performance section
+     */
+    function updateSubjectPerformance(subjects) {
+        const container = document.querySelector('.progress-list-v5');
+        if (!container) return;
+
+        const newHTML = subjects.map(subject => `
+            <div class="progress-item-v5">
+                <div class="progress-header-v5">
+                    <span class="progress-label-v5">${escapeHtml(subject.subject)}</span>
+                    <span class="progress-percentage-v5">${subject.avg_percentage.toFixed(1)}%</span>
+                </div>
+                <div class="progress-bar-container-v5">
+                    <div class="progress-bar-v5" data-progress="${subject.avg_percentage.toFixed(1)}" 
+                         style="width: ${subject.avg_percentage}%;"></div>
+                </div>
+            </div>
+        `).join('');
+
+        container.innerHTML = newHTML;
+    }
+
+    /**
+     * Update recent activities section
+     */
+    function updateRecentActivities(activities) {
+        const container = document.querySelector('.activity-list-v5');
+        if (!container || !activities || activities.length === 0) return;
+
+        const newActivities = activities.map(activity => {
+            if (activity.type === 'grade') {
+                return `
+                    <div class="activity-item-v5">
+                        <div class="activity-icon-v5 blue">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="activity-content-v5">
+                            <div class="activity-title-v5">
+                                ${escapeHtml(activity.activity_name)} 
+                                <span style="font-size: 0.85rem; color: var(--gray-medium);">
+                                    (${capitalizeFirst(activity.activity_type)})
+                                </span>
+                            </div>
+                            <div class="activity-details-v5">
+                                <strong>${escapeHtml(activity.teacher_name)}</strong> • 
+                                ${escapeHtml(activity.subject)}<br>
+                                Score: <strong>${activity.score}/${activity.max_score}</strong> 
+                                (${activity.percentage.toFixed(1)}%)
+                            </div>
+                            <div class="activity-time-v5">${formatDateTime(activity.event_date)}</div>
+                        </div>
+                    </div>
+                `;
+            } else if (activity.type === 'attendance') {
+                const iconClass = activity.attendance_status === 'present' ? 'green' : 'red';
+                const icon = activity.attendance_status === 'present' ? 'check-circle' : 'times-circle';
+                return `
+                    <div class="activity-item-v5">
+                        <div class="activity-icon-v5 ${iconClass}">
+                            <i class="fas fa-${icon}"></i>
+                        </div>
+                        <div class="activity-content-v5">
+                            <div class="activity-title-v5">
+                                Attendance Mark - 
+                                <span style="text-transform: capitalize;">
+                                    ${activity.attendance_status}
+                                </span>
+                            </div>
+                            <div class="activity-details-v5">
+                                <strong>${escapeHtml(activity.teacher_name)}</strong> • 
+                                ${escapeHtml(activity.subject)}
+                            </div>
+                            <div class="activity-time-v5">${formatDateTime(activity.event_date)}</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }).join('');
+
+        container.innerHTML = newActivities;
     }
 
     /**
@@ -146,15 +284,13 @@
         statValues.forEach((stat) => {
             const text = stat.textContent.trim();
             const hasPercent = text.includes('%');
-            
-            // Extract number from string (remove % and any non-numeric chars except .)
             const numberMatch = text.match(/[\d.]+/);
+            
             if (!numberMatch) return;
             
             const number = parseFloat(numberMatch[0]);
             
             if (!isNaN(number) && number > 0) {
-                // Only animate if number is greater than 0
                 if (hasPercent) {
                     animateValue(stat, 0, Math.round(number), 1000, true);
                 } else {
@@ -180,15 +316,9 @@
         
         const timer = setInterval(() => {
             current += increment;
-            if (hasPercent) {
-                element.textContent = current + '%';
-            } else {
-                element.textContent = current;
-            }
+            element.textContent = hasPercent ? current + '%' : current;
             
-            if (current === end) {
-                clearInterval(timer);
-            }
+            if (current === end) clearInterval(timer);
         }, stepTime);
     }
 
@@ -227,7 +357,6 @@
             }, 50);
         }
         
-        // Also update navbar profile if exists
         const navbarProfileImg = document.querySelector('.profile-button img');
         if (navbarProfileImg) {
             navbarProfileImg.src = pictureUrl + '?t=' + new Date().getTime();
@@ -235,70 +364,70 @@
     }
 
     /**
-     * Add smooth scroll behavior
+     * Utility: Escape HTML special characters
      */
-    function setupSmoothScroll() {
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    /**
+     * Utility: Capitalize first letter
+     */
+    function capitalizeFirst(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    /**
+     * Utility: Format datetime for display
+     */
+    function formatDateTime(datetime) {
+        const date = new Date(datetime);
+        const now = new Date();
+        const diffTime = Math.abs(now - date);
+        const diffMinutes = Math.ceil(diffTime / (1000 * 60));
+        const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffMinutes < 1) return 'Just now';
+        if (diffMinutes < 60) return `${diffMinutes}m ago`;
+        if (diffHours < 24) return `${diffHours}h ago`;
+        if (diffDays < 7) return `${diffDays}d ago`;
+
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+            hour: '2-digit',
+            minute: '2-digit'
         });
     }
 
     /**
-     * Card animation on scroll
+     * Cleanup on page unload
      */
-    function setupScrollAnimations() {
-        const cards = document.querySelectorAll('.stat-card-v5, .chart-card-v5');
-        
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '0';
-                    entry.target.style.transform = 'translateY(20px)';
-                    
-                    setTimeout(() => {
-                        entry.target.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0)';
-                    }, 100);
-                    
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, {
-            threshold: 0.1
-        });
-        
-        cards.forEach(card => {
-            observer.observe(card);
-        });
-    }
+    window.addEventListener('beforeunload', function() {
+        if (updateInterval) clearInterval(updateInterval);
+    });
 
     // Initialize when DOM is ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            initDashboard();
-            setupSmoothScroll();
-            setupScrollAnimations();
-        });
+        document.addEventListener('DOMContentLoaded', initDashboard);
     } else {
         initDashboard();
-        setupSmoothScroll();
-        setupScrollAnimations();
     }
 
     // Export functions for global use
-    window.DashboardV5 = {
-        updateProfilePicture: updateProfilePicture,
-        animateProgressBars: animateProgressBars
+    window.DashboardV6 = {
+        updateProfilePicture,
+        animateProgressBars,
+        refreshDashboard: fetchDashboardUpdates
     };
 
 })();

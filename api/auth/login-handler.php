@@ -1,4 +1,9 @@
 <?php
+/**
+ * Login Handler - FIXED
+ * Properly loads unique profile picture per user
+ */
+
 require_once '../../includes/config.php';
 require_once '../../includes/functions.php';
 
@@ -23,8 +28,22 @@ if (!isValidEmail($email)) {
 }
 
 try {
-    // Check if user exists
-    $stmt = $conn->prepare("SELECT user_id, email, password, full_name, role, status, email_verified, created_at FROM users WHERE email = ?");
+    // FIXED: Fetch user with profile_picture
+    $stmt = $conn->prepare("
+        SELECT 
+            user_id, 
+            email, 
+            password, 
+            full_name, 
+            middle_name,
+            role, 
+            status, 
+            email_verified, 
+            profile_picture,
+            created_at 
+        FROM users 
+        WHERE email = ?
+    ");
     $stmt->execute([$email]);
     $user = $stmt->fetch();
     
@@ -42,24 +61,20 @@ try {
         redirectWithMessage(BASE_URL . 'auth/login.php', 'danger', 'Invalid email or password.');
     }
     
-    // ✅ AUTO-VERIFY LEGACY USERS (created before verification system)
+    // Auto-verify legacy users (created before verification system)
     if (!$user['email_verified']) {
-        // If user was created before Jan 30, 2025, auto-verify them
         if (strtotime($user['created_at']) < strtotime('2025-01-30')) {
             $stmt = $conn->prepare("UPDATE users SET email_verified = TRUE WHERE user_id = ?");
             $stmt->execute([$user['user_id']]);
             
-            // Update the $user array
             $user['email_verified'] = true;
             
-            // Log this action
             logAudit($conn, $user['user_id'], 'Auto-verified legacy user', 'update', 'users', $user['user_id'], 'Email auto-verified for legacy account');
         }
     }
     
-    // ✅ Check if email is verified (for new users)
+    // Check if email is verified (for new users)
     if (!$user['email_verified']) {
-        // Store user info in session for resending verification
         $_SESSION['pending_verification_user_id'] = $user['user_id'];
         $_SESSION['pending_verification_email'] = $user['email'];
         
@@ -74,7 +89,9 @@ try {
     $_SESSION['user_id'] = $user['user_id'];
     $_SESSION['email'] = $user['email'];
     $_SESSION['full_name'] = $user['full_name'];
+    $_SESSION['middle_name'] = $user['middle_name'];
     $_SESSION['role'] = $user['role'];
+    $_SESSION['profile_picture'] = $user['profile_picture']; // CRITICAL: Store actual profile_picture from DB
     $_SESSION['last_activity'] = time();
     
     // Set remember me cookie if checked (30 days)
@@ -98,3 +115,4 @@ try {
     error_log("Login Error: " . $e->getMessage());
     redirectWithMessage(BASE_URL . 'auth/login.php', 'danger', 'An error occurred. Please try again.');
 }
+?>

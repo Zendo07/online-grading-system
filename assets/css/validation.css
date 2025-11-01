@@ -1,0 +1,131 @@
+/* ===== VALIDATION STYLES ===== */
+
+/* Validation Messages */
+.validation-message {
+  font-size: 12px;
+  margin-top: 4px;
+  display: none;
+  animation: slideDown 0.2s ease;
+}
+
+.validation-message.error {
+  color: #e74c3c;
+  display: block;
+}
+
+.validation-message.success {
+  color: #10b981;
+  display: block;
+}
+
+.validation-message.warning {
+  color: #f59e0b;
+  display: block;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Input States */
+input.valid {
+  border-color: #10b981 !important;
+}
+
+input.invalid {
+  border-color: #e74c3c !important;
+}
+
+/* Password Strength Indicator */
+.password-strength {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+  height: 4px;
+}
+
+.password-strength span {
+  flex: 1;
+  background: #e0e0e0;
+  border-radius: 2px;
+  transition: background 0.3s ease;
+}
+
+.password-strength.weak span:nth-child(1) {
+  background: #e74c3c;
+}
+
+.password-strength.medium span:nth-child(1),
+.password-strength.medium span:nth-child(2) {
+  background: #f59e0b;
+}
+
+.password-strength.strong span {
+  background: #10b981;
+}
+
+.password-strength-text {
+  font-size: 12px;
+  margin-top: 4px;
+  font-weight: 500;
+  display: none;
+}
+
+.password-strength-text.weak {
+  color: #e74c3c;
+  display: block;
+}
+
+.password-strength-text.medium {
+  color: #f59e0b;
+  display: block;
+}
+
+.password-strength-text.strong {
+  color: #10b981;
+  display: block;
+}
+
+/* Character Counter */
+.char-counter {
+  font-size: 11px;
+  color: #777777;
+  margin-top: 4px;
+}
+
+/* Toast Animation */
+@keyframes slideIn {
+  from { 
+    transform: translateX(100%); 
+    opacity: 0; 
+  }
+  to { 
+    transform: translateX(0); 
+    opacity: 1; 
+  }
+}
+
+/* Alert Styles */
+.alert {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.alert-danger {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5) !important;
+  color: #dc2626;
+}
+
+.alert-success {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.5) !important;
+  color: #059669;
+}

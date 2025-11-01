@@ -17,6 +17,7 @@ $flash = getFlashMessage();
 <title>Student Registration | PSU</title>
 
 <link rel="stylesheet" href="../assets/css/teacher-register.css">
+<link rel="stylesheet" href="../assets/css/validation.css">
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -39,8 +40,8 @@ $flash = getFlashMessage();
 
   <div class="signup-container">
     <div class="form-section">
-      <h1>Sign Up</h1>
-      <p>Enter your student account information below.</p>
+      <h1>Student Registration</h1>
+      <p>Create your account to get started.</p>
 
       <div id="toast" style="display: none; position: fixed; top: 20px; right: 20px; padding: 15px 20px; border-radius: 8px; color: white; font-weight: 500; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.3); animation: slideIn 0.3s ease;"></div>
 
@@ -50,10 +51,11 @@ $flash = getFlashMessage();
         </div>
       <?php endif; ?>
 
-      <form method="POST" action="../api/auth/register-handler.php" id="registerForm">
+      <form method="POST" action="../api/auth/register-handler.php" id="registerForm" novalidate>
 
         <input type="hidden" name="role" value="student">
 
+        <!-- Name Fields -->
         <div class="name-row">
           <div class="input-group">
             <label for="first_name">👤 First Name</label>
@@ -64,6 +66,18 @@ $flash = getFlashMessage();
               placeholder="First Name" 
               required
             />
+            <div class="validation-message" id="first_name_error"></div>
+          </div>
+
+          <div class="input-group">
+            <label for="middle_name">Middle Name</label>
+            <input 
+              type="text" 
+              id="middle_name" 
+              name="middle_name" 
+              placeholder="Middle Name (Optional)"
+            />
+            <div class="validation-message" id="middle_name_error"></div>
           </div>
 
           <div class="input-group">
@@ -75,9 +89,11 @@ $flash = getFlashMessage();
               placeholder="Last Name" 
               required
             />
+            <div class="validation-message" id="last_name_error"></div>
           </div>
         </div>
 
+        <!-- Email -->
         <div class="input-group">
           <label for="email">📧 Email</label>
           <input 
@@ -87,30 +103,72 @@ $flash = getFlashMessage();
             placeholder="Email" 
             required
           />
+          <div class="validation-message" id="email_error"></div>
         </div>
 
-        <div class="input-group">
-          <label for="student_number">🎓 Student Number</label>
-          <input 
-            type="text" 
-            id="student_number" 
-            name="student_number" 
-            placeholder="e.g., 2024-12345"
-            required
-          />
+        <!-- Program & Student Number Row -->
+        <div class="two-column-row">
+          <div class="input-group">
+            <label for="program">🎓 Course Program</label>
+            <select 
+              id="program" 
+              name="program" 
+              required
+            >
+              <option value="">Select your program</option>
+              <option value="BSIT">BSIT - Bachelor of Science in Information Technology</option>
+              <option value="BSCS">BSCS - Bachelor of Science in Computer Science</option>
+              <option value="ACT">ACT - Associate in Computer Technology</option>
+              <option value="BSIS">BSIS - Bachelor of Science in Information Systems</option>
+            </select>
+            <div class="validation-message" id="program_error"></div>
+          </div>
+
+          <div class="input-group">
+            <label for="student_number">🎓 Student Number</label>
+            <input 
+              type="text" 
+              id="student_number" 
+              name="student_number" 
+              placeholder="e.g., 2024123456"
+              maxlength="10"
+              required
+            />
+            <div class="char-counter" id="student_number_counter">0/10 digits</div>
+            <div class="validation-message" id="student_number_error"></div>
+          </div>
         </div>
 
-        <div class="input-group">
-          <label for="contact_number">📞 Contact Number (Optional)</label>
-          <input 
-            type="text" 
-            id="contact_number" 
-            name="contact_number" 
-            placeholder="09XXXXXXXXX"
-            maxlength="11"
-          />
+        <!-- Year & Section and Contact Number Row -->
+        <div class="two-column-row">
+          <div class="input-group">
+            <label for="year_section">🏫 Year & Section</label>
+            <input 
+              type="text" 
+              id="year_section" 
+              name="year_section" 
+              placeholder="e.g., BSCS 3-A"
+              maxlength="20"
+              required
+            />
+            <div class="validation-message" id="year_section_error"></div>
+          </div>
+
+          <div class="input-group">
+            <label for="contact_number">📞 Contact Number (Optional)</label>
+            <input 
+              type="text" 
+              id="contact_number" 
+              name="contact_number" 
+              placeholder="09XXXXXXXXX"
+              maxlength="11"
+            />
+            <div class="char-counter" id="contact_number_counter">0/11 digits</div>
+            <div class="validation-message" id="contact_number_error"></div>
+          </div>
         </div>
 
+        <!-- Password Fields -->
         <div class="input-group">
           <label for="password">🔒 Password</label>
           <input 
@@ -121,10 +179,17 @@ $flash = getFlashMessage();
             required
             minlength="8"
           />
+          <div class="password-strength" id="password_strength">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="password-strength-text" id="password_strength_text"></div>
+          <div class="validation-message" id="password_error"></div>
         </div>
 
         <div class="input-group">
-          <label for="confirm_password">🔑 Confirm Password</label>
+          <label for="confirm_password">🔒 Confirm Password</label>
           <input 
             type="password" 
             id="confirm_password" 
@@ -133,11 +198,13 @@ $flash = getFlashMessage();
             required
             minlength="8"
           />
+          <div class="validation-message" id="confirm_password_error"></div>
         </div>
 
+        <!-- Submit Buttons -->
         <div class="btn-row">
           <button type="button" class="back-btn" onclick="window.location.href='login.php'">Back</button>
-          <button type="submit" class="next-btn" id="submitBtn">Confirm</button>
+          <button type="submit" class="next-btn" id="submitBtn" disabled>Confirm</button>
         </div>
 
       </form>
@@ -151,69 +218,6 @@ $flash = getFlashMessage();
     <a href="#">FAQs</a>
   </div>
 
-  <style>
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    .alert {
-      background: rgba(255, 255, 255, 0.2);
-      border-color: rgba(255, 255, 255, 0.4) !important;
-    }
-    .alert-danger {
-      background: rgba(239, 68, 68, 0.2);
-      border-color: rgba(239, 68, 68, 0.5) !important;
-      color: #dc2626;
-    }
-  </style>
-
-  <script>
-    const form = document.getElementById('registerForm');
-    const submitBtn = document.getElementById('submitBtn');
-
-    document.getElementById('contact_number').addEventListener('input', function(e) {
-      this.value = this.value.replace(/[^0-9]/g, '').substring(0, 11);
-    });
-
-    form.addEventListener('submit', function(e) {
-      const password = document.getElementById('password').value;
-      const confirmPassword = document.getElementById('confirm_password').value;
-
-      if (password !== confirmPassword) {
-        e.preventDefault();
-        showToast('Passwords do not match!', 'error');
-        return false;
-      }
-
-      if (password.length < 8) {
-        e.preventDefault();
-        showToast('Password must be at least 8 characters!', 'error');
-        return false;
-      }
-
-      submitBtn.textContent = 'Creating Account...';
-      submitBtn.disabled = true;
-    });
-
-    function showToast(message, type) {
-      const toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.style.display = 'block';
-      
-      if (type === 'success') {
-        toast.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
-      } else {
-        toast.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
-      }
-
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        setTimeout(() => {
-          toast.style.display = 'none';
-          toast.style.opacity = '1';
-        }, 300);
-      }, 3000);
-    }
-  </script>
+  <script src="../assets/js/student-register-validation.js"></script>
 </body>
 </html>

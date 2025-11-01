@@ -1,0 +1,652 @@
+/* Student Profile Page - Modern UI/UX */
+
+:root {
+    --maroon: #7b2d26;
+    --maroon-dark: #5a1f18;
+    --maroon-light: #a74c42;
+    --cream: #f9efef;
+    --peach: #f5d5c8;
+    --white: #ffffff;
+    --gray-dark: #333333;
+    --gray-medium: #666666;
+    --gray-light: #f0f0f0;
+    --gray-lighter: #f9f9f9;
+    --shadow: 0 4px 20px rgba(123, 45, 38, 0.08);
+    --shadow-hover: 0 8px 30px rgba(123, 45, 38, 0.12);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==================== CONTAINER ==================== */
+.profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 32px;
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==================== PROFILE HEADER CARD ==================== */
+.profile-header-card {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 48px 40px;
+    box-shadow: var(--shadow);
+    margin-bottom: 32px;
+    transition: var(--transition);
+}
+
+.profile-header-card:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+.profile-header-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 48px;
+    align-items: start;
+}
+
+/* ==================== PROFILE IMAGE SECTION ==================== */
+.profile-image-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.profile-image-wrapper {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid var(--peach);
+    box-shadow: 0 8px 32px rgba(123, 45, 38, 0.15);
+    animation: slideInLeft 0.5s ease;
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.profile-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.profile-image-overlay {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(135deg, var(--maroon) 0%, var(--maroon-light) 100%);
+    padding: 8px 12px;
+    border-radius: 50px;
+    font-size: 12px;
+    color: var(--white);
+}
+
+.profile-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+}
+
+.profile-status-badge::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+}
+
+.btn-change-photo {
+    padding: 12px 24px;
+    background: var(--gray-light);
+    border: 2px solid var(--gray-light);
+    border-radius: 10px;
+    cursor: not-allowed;
+    color: var(--gray-medium);
+    font-weight: 600;
+    font-size: 14px;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0.6;
+}
+
+.btn-change-photo:disabled {
+    background: var(--gray-light);
+    border-color: var(--gray-light);
+}
+
+.btn-change-photo:not(:disabled):hover {
+    background: var(--maroon);
+    border-color: var(--maroon);
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
+/* ==================== PROFILE INFO SECTION ==================== */
+.profile-info-section {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    animation: slideInRight 0.5s ease;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.profile-name-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.profile-name-item,
+.profile-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.profile-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gray-medium);
+}
+
+.profile-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gray-dark);
+    margin: 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--cream);
+}
+
+.profile-details-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+/* ==================== TABS SECTION ==================== */
+.profile-tabs-section {
+    background: var(--white);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.profile-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid var(--gray-light);
+    padding: 0;
+    background: var(--gray-lighter);
+}
+
+.tab-button {
+    flex: 1;
+    padding: 18px 24px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gray-medium);
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    border-radius: 0;
+}
+
+.tab-button:hover {
+    color: var(--maroon);
+    background: rgba(123, 45, 38, 0.05);
+}
+
+.tab-button.active {
+    color: var(--maroon);
+    background: var(--white);
+}
+
+.tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--maroon) 0%, var(--maroon-light) 100%);
+}
+
+/* ==================== TAB CONTENT ==================== */
+.tab-content {
+    display: none;
+    padding: 40px;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-content-card {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.tab-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--maroon);
+    margin: 0;
+}
+
+/* ==================== OVERVIEW TAB ==================== */
+.overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+}
+
+.overview-item {
+    display: flex;
+    gap: 20px;
+    padding: 24px;
+    background: var(--gray-lighter);
+    border-radius: 16px;
+    transition: var(--transition);
+    border: 2px solid transparent;
+}
+
+.overview-item:hover {
+    background: var(--cream);
+    border-color: var(--peach);
+    transform: translateY(-4px);
+}
+
+.overview-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(123, 45, 38, 0.1) 0%, rgba(245, 213, 200, 0.2) 100%);
+    border-radius: 12px;
+    font-size: 24px;
+    color: var(--maroon);
+    flex-shrink: 0;
+}
+
+.overview-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.overview-text h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gray-dark);
+    margin: 0;
+}
+
+.overview-text p {
+    font-size: 14px;
+    color: var(--gray-medium);
+    margin: 0;
+}
+
+.overview-link {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--maroon);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    transition: var(--transition);
+}
+
+.overview-link:hover {
+    gap: 12px;
+    color: var(--maroon-dark);
+}
+
+/* ==================== HELP TAB ==================== */
+.help-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.help-item {
+    padding: 24px;
+    background: var(--gray-lighter);
+    border-radius: 12px;
+    border-left: 4px solid var(--maroon);
+    transition: var(--transition);
+}
+
+.help-item:hover {
+    background: var(--cream);
+}
+
+.help-item h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gray-dark);
+    margin: 0 0 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.help-item h4 i {
+    color: var(--maroon);
+    font-size: 18px;
+}
+
+.help-item p {
+    font-size: 14px;
+    color: var(--gray-medium);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.help-cta {
+    margin-top: 24px;
+    padding: 24px;
+    background: linear-gradient(135deg, rgba(123, 45, 38, 0.05) 0%, rgba(245, 213, 200, 0.1) 100%);
+    border-radius: 12px;
+    border: 2px dashed var(--peach);
+    text-align: center;
+}
+
+.help-cta p {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--maroon);
+    margin: 0;
+}
+
+/* ==================== SETTINGS TAB ==================== */
+.settings-section {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.settings-group {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.settings-group h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gray-dark);
+    margin: 0;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--gray-light);
+}
+
+.settings-warning {
+    font-size: 13px;
+    color: #dc2626;
+    font-weight: 500;
+    margin: 0;
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: var(--gray-lighter);
+    border-radius: 12px;
+    transition: var(--transition);
+}
+
+.setting-item:hover {
+    background: var(--cream);
+}
+
+.setting-item.danger {
+    background: rgba(220, 38, 38, 0.05);
+    border: 2px solid rgba(220, 38, 38, 0.1);
+}
+
+.setting-item.danger:hover {
+    background: rgba(220, 38, 38, 0.08);
+}
+
+.setting-label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.setting-label label {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gray-dark);
+    margin: 0;
+}
+
+.setting-description {
+    font-size: 13px;
+    color: var(--gray-medium);
+    margin: 0;
+}
+
+.setting-value {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.setting-value span {
+    font-size: 14px;
+    color: var(--gray-dark);
+    font-weight: 500;
+}
+
+.badge-active {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: #d1fae5;
+    color: #065f46;
+    font-weight: 600;
+    font-size: 13px;
+    border-radius: 6px;
+}
+
+.role-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, rgba(123, 45, 38, 0.1) 0%, rgba(245, 213, 200, 0.2) 100%);
+    color: var(--maroon);
+    font-weight: 600;
+    font-size: 13px;
+    border-radius: 6px;
+}
+
+.btn-settings-action {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, var(--maroon) 0%, var(--maroon-light) 100%);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-settings-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(123, 45, 38, 0.3);
+}
+
+.btn-settings-danger {
+    padding: 10px 20px;
+    background: #fef2f2;
+    color: #dc2626;
+    border: 2px solid #fecaca;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: not-allowed;
+    transition: var(--transition);
+    opacity: 0.6;
+}
+
+.btn-settings-danger:hover:not(:disabled) {
+    background: #fee2e2;
+    border-color: #fca5a5;
+    transform: translateY(-2px);
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+@media (max-width: 1024px) {
+    .profile-container {
+        padding: 24px 20px;
+    }
+
+    .profile-header-card {
+        padding: 32px 24px;
+    }
+
+    .profile-header-content {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+
+    .profile-image-wrapper {
+        width: 160px;
+        height: 160px;
+    }
+
+    .profile-name-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .overview-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .profile-container {
+        padding: 16px 16px;
+    }
+
+    .profile-header-card {
+        padding: 24px 16px;
+        margin-bottom: 24px;
+    }
+
+    .profile-header-content {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .profile-image-section {
+        margin: 0 auto;
+    }
+
+    .profile-image-wrapper {
+        width: 140px;
+        height: 140px;
+    }
+
+    .profile-name-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-tabs {
+        flex-wrap: wrap;
+    }
+
+    .tab-button {
+        flex: 1 1 calc(33.333% - 8px);
+        padding: 14px 12px;
+        font-size: 13px;
+    }
+
+    .tab-content {
+        padding: 24px 16px;
+    }
+
+    .tab-title {
+        font-size: 20px;
+    }
+
+    .setting-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .setting-value {
+        width: 100%;
+    }
+}

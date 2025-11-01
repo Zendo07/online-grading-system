@@ -1,5 +1,5 @@
 <?php
-// Reusable PHP Functions
+// Reusable PHP Functions - FIXED PROFILE PICTURE HANDLING
 
 // Sanitize input data
 function sanitize($data) {
@@ -187,32 +187,31 @@ function uploadProfilePicture($file, $user_id) {
     return ['success' => false, 'message' => 'Failed to save file to server.'];
 }
 
-// Get profile picture URL
-function getProfilePicture($filename, $fallback_text = '?') {
-    if (empty($filename)) {
-        // Return data URL for a colored circle with letter
-        $letter = strtoupper(substr($fallback_text, 0, 1));
-        return 'data:image/svg+xml;base64,' . base64_encode('
-            <svg width="150" height="150" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="75" cy="75" r="75" fill="#8B4049"/>
-                <text x="75" y="95" font-size="60" fill="white" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold">' . $letter . '</text>
-            </svg>
-        ');
+/**
+ * Get profile picture URL - FIXED VERSION
+ * Returns default avatar for new accounts (NULL or empty profile_picture)
+ * Returns uploaded picture only if it exists in database AND file exists on disk
+ * 
+ * @param string|null $profile_picture - Filename from database (can be NULL or empty for new accounts)
+ * @param string $full_name - User's full name (fallback for generating initials)
+ * @return string - Full URL to profile picture or default avatar
+ */
+function getProfilePicture($profile_picture, $full_name = '') {
+    // CRITICAL: If profile_picture is NULL or empty, return default avatar
+    if (empty($profile_picture) || is_null($profile_picture)) {
+        return BASE_URL . 'assets/images/default-avatar.jpg';
     }
     
-    $file_path = __DIR__ . '/../uploads/profiles/' . $filename;
+    // Check if the uploaded file exists on disk
+    $file_path = __DIR__ . '/../uploads/profiles/' . $profile_picture;
+    
     if (file_exists($file_path)) {
-        return BASE_URL . 'uploads/profiles/' . $filename;
+        // File exists, return the uploaded profile picture
+        return BASE_URL . 'uploads/profiles/' . $profile_picture;
     }
     
-    // If file doesn't exist, return default
-    $letter = strtoupper(substr($fallback_text, 0, 1));
-    return 'data:image/svg+xml;base64,' . base64_encode('
-        <svg width="150" height="150" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="75" cy="75" r="75" fill="#8B4049"/>
-            <text x="75" y="95" font-size="60" fill="white" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold">' . $letter . '</text>
-        </svg>
-    ');
+    // File doesn't exist (deleted or corrupted), return default avatar
+    return BASE_URL . 'assets/images/default-avatar.jpg';
 }
 
 // Calculate overall grade for a student in a class
