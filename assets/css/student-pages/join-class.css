@@ -1,0 +1,450 @@
+/* Join Class Page Styles - Maroon & Peach Theme */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Reset and Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Page Background */
+.join-class-page {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #fff5f0 0%, #ffe8dc 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Top Navigation Bar */
+.join-class-nav {
+    background: #fff;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 8px rgba(128, 0, 32, 0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.join-back-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: #800020;
+    font-weight: 500;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background: #fff;
+    border: 2px solid #800020;
+}
+
+.join-back-btn:hover {
+    background: #800020;
+    color: #fff;
+    transform: translateX(-3px);
+}
+
+.join-user-badge {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: linear-gradient(135deg, #800020 0%, #a0002a 100%);
+    padding: 0.7rem 1.5rem;
+    border-radius: 50px;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(128, 0, 32, 0.2);
+}
+
+.join-user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fff;
+    color: #800020;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.join-user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.join-user-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.join-user-id {
+    font-size: 0.75rem;
+    opacity: 0.9;
+}
+
+/* Main Content Container */
+.join-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+
+.join-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(128, 0, 32, 0.12);
+    max-width: 550px;
+    width: 100%;
+    overflow: hidden;
+    animation: slideUp 0.5s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Card Header */
+.join-card-header {
+    background: linear-gradient(135deg, #800020 0%, #a0002a 100%);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+}
+
+.join-card-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 4s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.join-welcome-icon {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    position: relative;
+}
+
+.join-card-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    position: relative;
+}
+
+.join-card-header p {
+    font-size: 0.95rem;
+    opacity: 0.95;
+    font-weight: 300;
+    position: relative;
+}
+
+/* Card Body */
+.join-card-body {
+    padding: 2.5rem 2rem;
+}
+
+/* Form Styles */
+.join-form-group {
+    margin-bottom: 2rem;
+}
+
+.join-form-label {
+    display: block;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+}
+
+.join-input-wrapper {
+    position: relative;
+}
+
+.join-form-control {
+    width: 100%;
+    padding: 1rem 1.2rem;
+    font-size: 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
+    background: #fafafa;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+}
+
+.join-form-control:focus {
+    outline: none;
+    border-color: #800020;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(128, 0, 32, 0.1);
+}
+
+.join-form-control::placeholder {
+    text-transform: none;
+    letter-spacing: normal;
+    font-weight: 400;
+}
+
+.join-input-icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #800020;
+    font-size: 1.2rem;
+    pointer-events: none;
+}
+
+.join-form-text {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* Info Box */
+.join-info-box {
+    background: linear-gradient(135deg, #fff5f0 0%, #ffe8dc 100%);
+    border-left: 4px solid #800020;
+    padding: 1rem 1.2rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: start;
+    gap: 0.8rem;
+}
+
+.join-info-icon {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.join-info-content {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.6;
+}
+
+.join-info-content strong {
+    color: #800020;
+    font-weight: 600;
+}
+
+/* Submit Button */
+.join-btn-submit {
+    width: 100%;
+    padding: 1.1rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(135deg, #800020 0%, #a0002a 100%);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(128, 0, 32, 0.3);
+    font-family: 'Poppins', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.join-btn-submit:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(128, 0, 32, 0.4);
+}
+
+.join-btn-submit:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.join-btn-submit:disabled {
+    background: linear-gradient(135deg, #ccc 0%, #aaa 100%);
+    cursor: not-allowed;
+    box-shadow: none;
+    opacity: 0.6;
+}
+
+/* Instructions Section */
+.join-instructions {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid #f0f0f0;
+}
+
+.join-instructions h3 {
+    color: #800020;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.join-instructions ol {
+    padding-left: 1.5rem;
+    color: #555;
+    line-height: 2;
+}
+
+.join-instructions li {
+    margin-bottom: 0.5rem;
+}
+
+/* Alert Messages */
+.join-alert {
+    padding: 1rem 1.2rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.join-alert-success {
+    background: #d4edda;
+    color: #155724;
+    border-left: 4px solid #28a745;
+}
+
+.join-alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+    border-left: 4px solid #dc3545;
+}
+
+.join-alert-warning {
+    background: #fff3cd;
+    color: #856404;
+    border-left: 4px solid #ffc107;
+}
+
+.join-alert-info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border-left: 4px solid #17a2b8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .join-class-nav {
+        padding: 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .join-back-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .join-user-badge {
+        padding: 0.5rem 1rem;
+        flex: 1;
+        justify-content: flex-end;
+    }
+
+    .join-user-info {
+        display: none;
+    }
+
+    .join-user-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+
+    .join-card-header {
+        padding: 2rem 1.5rem;
+    }
+
+    .join-card-header h1 {
+        font-size: 1.6rem;
+    }
+
+    .join-welcome-icon {
+        font-size: 2.5rem;
+    }
+
+    .join-card-body {
+        padding: 2rem 1.5rem;
+    }
+
+    .join-card {
+        margin: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .join-container {
+        padding: 1rem 0.5rem;
+    }
+
+    .join-card-header h1 {
+        font-size: 1.4rem;
+    }
+
+    .join-card-header p {
+        font-size: 0.85rem;
+    }
+
+    .join-card-body {
+        padding: 1.5rem 1rem;
+    }
+
+    .join-form-control {
+        padding: 0.9rem 1rem;
+        font-size: 0.95rem;
+    }
+
+    .join-btn-submit {
+        padding: 1rem;
+        font-size: 1rem;
+    }
+
+    .join-instructions ol {
+        padding-left: 1.2rem;
+        font-size: 0.9rem;
+    }
+}

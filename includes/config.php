@@ -22,6 +22,7 @@ define('ASSETS_PATH', BASE_URL . 'assets/');
 define('CSS_PATH', ASSETS_PATH . 'css/');
 define('JS_PATH', ASSETS_PATH . 'js/');
 define('IMG_PATH', ASSETS_PATH . 'images/');
+define('CSS_PATH', BASE_URL . 'assets/css/');
 
 // Security settings
 define('PASSWORD_MIN_LENGTH', 8);
