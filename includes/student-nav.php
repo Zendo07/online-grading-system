@@ -1,5 +1,5 @@
 <?php
-// includes/student-nav.php - ENHANCED VERSION
+// includes/student-nav.php - UPDATED VERSION
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 
@@ -64,6 +64,18 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </li>
                 
                 <li class="nav-item">
+                    <a href="<?php echo BASE_URL; ?>student/my-courses.php" class="<?php echo $current_page == 'my-courses.php' ? 'active' : ''; ?>">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                            </svg>
+                        </span>
+                        <span class="nav-text">My Courses</span>
+                    </a>
+                </li>
+                
+                <li class="nav-item">
                     <a href="<?php echo BASE_URL; ?>student/my-grades.php" class="<?php echo $current_page == 'my-grades.php' ? 'active' : ''; ?>">
                         <span class="nav-icon">
                             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -74,23 +86,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                 <polyline points="10 9 9 9 8 9"/>
                             </svg>
                         </span>
-                        <span class="nav-text">My Grades</span>
+                        <span class="nav-text">My Professors</span>
                     </a>
                 </li>
                 
-                <li class="nav-item">
-                    <a href="<?php echo BASE_URL; ?>student/my-attendance.php" class="<?php echo $current_page == 'my-attendance.php' ? 'active' : ''; ?>">
-                        <span class="nav-icon">
-                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                                <line x1="16" y1="2" x2="16" y2="6"/>
-                                <line x1="8" y1="2" x2="8" y2="6"/>
-                                <line x1="3" y1="10" x2="21" y2="10"/>
-                            </svg>
-                        </span>
-                        <span class="nav-text">My Attendance</span>
-                    </a>
-                </li>
                 
                 <li class="nav-item">
                     <a href="<?php echo BASE_URL; ?>student/audit-trail.php" class="<?php echo $current_page == 'audit-trail.php' ? 'active' : ''; ?>">
@@ -120,7 +119,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         <span class="nav-text">My Profile</span>
                     </a>
                 </li>
-                
                 
                 <li class="nav-item logout">
                     <a href="<?php echo BASE_URL; ?>auth/logout.php" onclick="return confirm('Are you sure you want to logout?');">

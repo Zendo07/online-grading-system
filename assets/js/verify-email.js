@@ -1,6 +1,6 @@
 /**
  * ====================================
- * EMAIL VERIFICATION - JavaScript
+ * EMAIL VERIFICATION - JavaScript (FIXED)
  * ====================================
  */
 
@@ -8,6 +8,7 @@
 const codeInputs = document.querySelectorAll('.code-input');
 const verifyForm = document.getElementById('verifyForm');
 const submitBtn = document.getElementById('submitBtn');
+const resendForm = document.getElementById('resendForm');
 const resendBtn = document.getElementById('resendBtn');
 
 // Initialize on DOM load
@@ -110,16 +111,20 @@ function initializeFormSubmission() {
 }
 
 /**
- * Setup resend button
+ * Setup resend button - FIXED to prevent form submission
  */
 function initializeResendButton() {
-    if (!resendBtn) return;
+    if (!resendForm) return;
     
-    resendBtn.addEventListener('click', resendCode);
+    // Prevent default form submission and use AJAX instead
+    resendForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        resendCode();
+    });
 }
 
 /**
- * Resend verification code
+ * Resend verification code - FIXED with better error handling
  */
 async function resendCode() {
     if (!resendBtn) return;
@@ -133,18 +138,45 @@ async function resendCode() {
     resendBtn.innerHTML = '<span class="spinner"></span> Sending...';
     
     try {
+        // Build the correct API URL
         const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.indexOf('/auth/'));
-        const response = await fetch(`${baseUrl}/api/auth/resend-code-handler.php`, {
+        const apiUrl = `${baseUrl}/api/auth/resend-code-handler.php`;
+        
+        console.log('Sending request to:', apiUrl); // Debug log
+        
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
-            }
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            credentials: 'same-origin'
         });
 
-        const result = await response.json();
+        // Check if response is OK
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // Get response text first to debug
+        const text = await response.text();
+        console.log('Response text:', text); // Debug log
+        
+        // Try to parse JSON
+        let result;
+        try {
+            result = JSON.parse(text);
+        } catch (parseError) {
+            console.error('JSON parse error:', parseError);
+            console.error('Response was:', text);
+            throw new Error('Invalid response from server. Please try again.');
+        }
 
         if (result.success) {
             showAlert('success', result.message || 'A new verification code has been sent to your email.');
+            
+            // Clear code inputs for new code entry
+            codeInputs.forEach(input => input.value = '');
+            codeInputs[0].focus();
             
             // Start countdown
             startResendCountdown(60);
@@ -155,7 +187,7 @@ async function resendCode() {
         }
     } catch (error) {
         console.error('Resend error:', error);
-        showAlert('danger', 'An error occurred. Please try again.');
+        showAlert('danger', error.message || 'An error occurred. Please try again.');
         resendBtn.innerHTML = originalHTML;
         resendBtn.disabled = false;
     }
@@ -207,7 +239,7 @@ function showAlert(type, message) {
         : '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>';
     
     alertDiv.innerHTML = `
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg class="alert-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             ${iconSvg}
         </svg>
         <span>${message}</span>

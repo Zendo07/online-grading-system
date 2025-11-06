@@ -214,7 +214,7 @@ $flash = getFlashMessage();
                         <h1>Welcome Back, <?php echo htmlspecialchars($_SESSION['full_name']); ?>!</h1>
                         <p>Your academic journey continues here. Check your grades, attendance, and manage your coursework all in one place.</p>
                         <div class="cta-buttons-v5">
-                            <a href="my-grades.php" class="btn-v5 btn-primary-v5">
+                            <a href="my-courses.php" class="btn-v5 btn-primary-v5">
                                 <i class="fas fa-arrow-right"></i> View Courses
                             </a>
                             <a href="join-class.php" class="btn-v5 btn-secondary-v5">

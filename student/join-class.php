@@ -22,7 +22,8 @@ $flash = getFlashMessage();
     <!-- Stylesheets -->
     <link rel="stylesheet" href="<?php echo CSS_PATH; ?>style.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="<?php echo CSS_PATH; ?>navigation.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="<?php echo CSS_PATH; ?>join-class.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="<?php echo CSS_PATH; ?>student-pages/join-class.css?v=<?php echo time(); ?>">
+
     
     <style>
         /* Ensure body and main content don't scroll */

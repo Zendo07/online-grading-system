@@ -61,6 +61,11 @@ $flash = getFlashMessage();
           </div>
 
           <div class="input-group">
+            <label for="middle_name">Middle Name</label>
+            <input type="text" id="middle_name" name="middle_name" placeholder="Middle Name (Optional)" />
+          </div>
+
+          <div class="input-group">
             <label for="last_name">Last Name</label>
             <input type="text" id="last_name" name="last_name" placeholder="Last Name" required />
           </div>
@@ -82,7 +87,7 @@ $flash = getFlashMessage();
         </div>
 
         <div class="input-group">
-          <label for="confirm_password">🔑 Confirm Password</label>
+          <label for="confirm_password">🔒 Confirm Password</label>
           <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm your Password" required minlength="8" />
         </div>
 
@@ -125,14 +130,36 @@ $flash = getFlashMessage();
       this.value = this.value.replace(/[^0-9]/g, '').substring(0, 11);
     });
 
+    // Validate name fields (letters, spaces, and common punctuation only)
+    const nameFields = ['first_name', 'middle_name', 'last_name'];
+    nameFields.forEach(fieldId => {
+      document.getElementById(fieldId).addEventListener('input', function(e) {
+        this.value = this.value.replace(/[^a-zA-Z\s\.\-']/g, '');
+      });
+    });
+
     form.addEventListener('submit', function(e) {
       const password = document.getElementById('password').value;
       const confirmPassword = document.getElementById('confirm_password').value;
       const invitationCode = document.getElementById('invitation_code').value;
+      const firstName = document.getElementById('first_name').value.trim();
+      const lastName = document.getElementById('last_name').value.trim();
 
       if (!invitationCode.trim()) {
         e.preventDefault();
         showToast('Teacher invitation code is required!', 'error');
+        return false;
+      }
+
+      if (!firstName) {
+        e.preventDefault();
+        showToast('First name is required!', 'error');
+        return false;
+      }
+
+      if (!lastName) {
+        e.preventDefault();
+        showToast('Last name is required!', 'error');
         return false;
       }
 

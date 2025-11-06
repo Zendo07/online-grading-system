@@ -1,0 +1,517 @@
+/* View Grades - Spreadsheet/Index Card Style */
+
+:root {
+    --maroon: #7b2d26;
+    --maroon-dark: #5a1f18;
+    --maroon-light: #a74c42;
+    --cream: #f9efef;
+    --peach: #f5d5c8;
+    --white: #ffffff;
+    --gray-dark: #333333;
+    --gray-medium: #666666;
+    --gray-light: #e5e5e5;
+    --gray-lighter: #f5f5f5;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --shadow: 0 2px 8px rgba(123, 45, 38, 0.1);
+    --shadow-lg: 0 4px 16px rgba(123, 45, 38, 0.15);
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--gray-lighter);
+    color: var(--gray-dark);
+}
+
+.main-content {
+    margin-top: 70px;
+    padding: 24px;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ==================== GRADES HEADER ==================== */
+.grades-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+    gap: 24px;
+    background: linear-gradient(135deg, var(--maroon) 0%, var(--maroon-light) 100%);
+    padding: 28px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+}
+
+.header-left {
+    flex: 1;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: var(--transition);
+    margin-bottom: 16px;
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateX(-4px);
+}
+
+.course-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--white);
+    margin-bottom: 8px;
+    line-height: 1.2;
+}
+
+.course-meta {
+    display: flex;
+    gap: 24px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+}
+
+.course-meta span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ==================== OVERALL GRADE CARD ==================== */
+.overall-grade-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 24px 32px;
+    text-align: center;
+    min-width: 200px;
+    box-shadow: var(--shadow-lg);
+}
+
+.grade-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.grade-value {
+    font-size: 48px;
+    font-weight: 800;
+    color: var(--maroon);
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.grade-rating {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--success);
+    padding: 4px 16px;
+    background: #d1fae5;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+/* ==================== GRADE CARDS ==================== */
+.grade-card {
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    margin-bottom: 24px;
+    overflow: hidden;
+    border: 2px solid var(--gray-light);
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--maroon) 0%, var(--maroon-light) 100%);
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid var(--maroon-dark);
+}
+
+.header-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--white);
+}
+
+.header-title i {
+    font-size: 24px;
+}
+
+.header-title h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.item-count,
+.attendance-summary {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--white);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.card-body {
+    padding: 0;
+}
+
+/* ==================== ATTENDANCE DISPLAY ==================== */
+.attendance-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 48px;
+    padding: 40px 24px;
+}
+
+.attendance-circle {
+    width: 200px;
+    height: 200px;
+}
+
+.circular-chart {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.circle-bg {
+    fill: none;
+    stroke: var(--gray-light);
+    stroke-width: 3.8;
+}
+
+.circle {
+    fill: none;
+    stroke-width: 3.8;
+    stroke-linecap: round;
+    stroke: var(--maroon);
+    animation: progress 1s ease-out forwards;
+}
+
+@keyframes progress {
+    0% {
+        stroke-dasharray: 0 100;
+    }
+}
+
+.percentage {
+    fill: var(--maroon);
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.5em;
+    font-weight: 700;
+    text-anchor: middle;
+}
+
+.attendance-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 12px 20px;
+    border-radius: 10px;
+    min-width: 200px;
+}
+
+.stat-item.present {
+    background: #d1fae5;
+    color: #065f46;
+    border: 2px solid var(--success);
+}
+
+.stat-item.absent {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 2px solid #ef4444;
+}
+
+.stat-item i {
+    font-size: 20px;
+}
+
+/* ==================== SPREADSHEET TABLE ==================== */
+.spreadsheet-table {
+    overflow-x: auto;
+}
+
+.spreadsheet-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    background: var(--white);
+}
+
+.spreadsheet-table thead {
+    background: linear-gradient(to bottom, var(--maroon-dark), var(--maroon));
+    color: var(--white);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.spreadsheet-table thead th {
+    padding: 16px 20px;
+    text-align: left;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 12px;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.spreadsheet-table thead th:last-child {
+    border-right: none;
+}
+
+.spreadsheet-table tbody tr {
+    border-bottom: 1px solid var(--gray-light);
+    transition: var(--transition);
+}
+
+.spreadsheet-table tbody tr:hover {
+    background: var(--cream);
+}
+
+.spreadsheet-table tbody tr:nth-child(even) {
+    background: var(--gray-lighter);
+}
+
+.spreadsheet-table tbody tr:nth-child(even):hover {
+    background: var(--cream);
+}
+
+.spreadsheet-table tbody td {
+    padding: 16px 20px;
+    border-right: 1px solid var(--gray-light);
+    font-weight: 500;
+}
+
+.spreadsheet-table tbody td:last-child {
+    border-right: none;
+}
+
+/* Column Specific Styles */
+.col-name {
+    font-weight: 600;
+    color: var(--gray-dark);
+    min-width: 200px;
+}
+
+.col-score {
+    text-align: center;
+    font-weight: 700;
+    color: var(--maroon);
+    min-width: 80px;
+}
+
+.col-total {
+    text-align: center;
+    font-weight: 600;
+    color: var(--gray-medium);
+    min-width: 80px;
+}
+
+.col-percentage {
+    text-align: center;
+    min-width: 100px;
+}
+
+.col-date {
+    text-align: center;
+    color: var(--gray-medium);
+    font-size: 13px;
+    min-width: 120px;
+}
+
+/* Badges */
+.percentage-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: linear-gradient(135deg, var(--maroon) 0%, var(--maroon-light) 100%);
+    color: var(--white);
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 13px;
+    box-shadow: var(--shadow);
+}
+
+.pending-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: #fef3c7;
+    color: #92400e;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 13px;
+    border: 2px solid var(--warning);
+}
+
+/* ==================== FOOTER ==================== */
+.footer {
+    background: var(--maroon);
+    color: var(--white);
+    padding: 24px;
+    text-align: center;
+    margin-top: 48px;
+    font-size: 14px;
+}
+
+.footer p {
+    margin: 0;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1024px) {
+    .grades-header {
+        flex-direction: column;
+    }
+
+    .overall-grade-card {
+        width: 100%;
+    }
+
+    .attendance-display {
+        flex-direction: column;
+        gap: 32px;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        padding: 16px;
+    }
+
+    .grades-header {
+        padding: 20px;
+    }
+
+    .course-title {
+        font-size: 22px;
+    }
+
+    .grade-value {
+        font-size: 36px;
+    }
+
+    .card-header {
+        padding: 16px 20px;
+    }
+
+    .header-title h2 {
+        font-size: 18px;
+    }
+
+    .attendance-circle {
+        width: 180px;
+        height: 180px;
+    }
+
+    .spreadsheet-table {
+        font-size: 13px;
+    }
+
+    .spreadsheet-table thead th,
+    .spreadsheet-table tbody td {
+        padding: 12px 16px;
+    }
+
+    .col-name {
+        min-width: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .course-title {
+        font-size: 18px;
+    }
+
+    .course-meta {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .attendance-circle {
+        width: 160px;
+        height: 160px;
+    }
+
+    .stat-item {
+        min-width: auto;
+        width: 100%;
+    }
+
+    .spreadsheet-table {
+        font-size: 12px;
+    }
+
+    .spreadsheet-table thead th,
+    .spreadsheet-table tbody td {
+        padding: 10px 12px;
+    }
+
+    .percentage-badge,
+    .pending-badge {
+        font-size: 11px;
+        padding: 4px 12px;
+    }
+}
+
+/* ==================== PRINT STYLES ==================== */
+@media print {
+    .back-btn,
+    .footer {
+        display: none;
+    }
+
+    .grade-card {
+        page-break-inside: avoid;
+    }
+
+    .spreadsheet-table {
+        page-break-inside: auto;
+    }
+
+    .spreadsheet-table tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+}

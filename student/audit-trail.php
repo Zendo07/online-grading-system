@@ -28,71 +28,112 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audit Trail - Online Grading System</title>
-    <link rel="stylesheet" href="<?php echo CSS_PATH; ?>style.css">
-    <link rel="stylesheet" href="<?php echo CSS_PATH; ?>dashboard.css">
+    <title>Audit Trail - indEx</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="<?php echo CSS_PATH; ?>style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="<?php echo CSS_PATH; ?>navigation.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="<?php echo CSS_PATH; ?>student-pages/log-history.css?v=<?php echo time(); ?>">
 </head>
 <body>
     <div class="dashboard-wrapper">
         <?php include '../includes/student-nav.php'; ?>
         
         <div class="main-content">
-            <header class="top-header">
-                <button class="menu-toggle" id="menuToggle">☰</button>
-                <div class="page-title-section">
-                    <h1>Audit Trail</h1>
-                    <p class="breadcrumb">Home / Audit Trail</p>
-                </div>
-            </header>
-            
-            <div class="dashboard-content">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Activity Log (Last 100 entries)</h2>
+            <div class="audit-trail-container">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <div class="page-header-content">
+                        <div class="page-icon">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <div class="page-title-section">
+                            <h1 class="page-title">Audit Trail</h1>
+                            <p class="page-subtitle">Track your activity history and system interactions</p>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <?php if (count($logs) > 0): ?>
-                            <div class="data-table-wrapper">
-                                <table class="data-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Action</th>
-                                            <th>Type</th>
-                                            <th>Description</th>
-                                            <th>Date & Time</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($logs as $log): ?>
-                                            <tr>
-                                                <td><?php echo htmlspecialchars($log['action']); ?></td>
-                                                <td>
-                                                    <span class="badge badge-<?php 
-                                                        echo match($log['action_type']) {
-                                                            'create' => 'success',
-                                                            'update' => 'info',
-                                                            'delete' => 'danger',
-                                                            'login' => 'success',
-                                                            'logout' => 'secondary',
-                                                            'join' => 'success',
-                                                            default => 'info'
-                                                        };
-                                                    ?>">
-                                                        <?php echo ucfirst($log['action_type']); ?>
-                                                    </span>
-                                                </td>
-                                                <td><?php echo htmlspecialchars($log['description'] ?? '-'); ?></td>
-                                                <td><?php echo formatDateTime($log['created_at']); ?></td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
+                </div>
+
+                <!-- Logs Card -->
+                <div class="logs-card">
+                    <div class="logs-header">
+                        <div class="header-left">
+                            <i class="fas fa-list-alt"></i>
+                            <div>
+                                <h3>Activity Log</h3>
+                                <p>Last 100 entries</p>
                             </div>
+                        </div>
+                        <div class="header-right">
+                            <span class="total-badge">
+                                <i class="fas fa-layer-group"></i>
+                                <?php echo count($logs); ?> Total
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="logs-list">
+                        <?php if (count($logs) > 0): ?>
+                            <?php 
+                            foreach ($logs as $log): 
+                                $actionType = $log['action_type'] ?? 'other';
+                                $iconMap = [
+                                    'login' => 'sign-in-alt',
+                                    'logout' => 'sign-out-alt',
+                                    'create' => 'plus-circle',
+                                    'update' => 'edit',
+                                    'delete' => 'trash-alt',
+                                    'join' => 'user-plus',
+                                    'other' => 'info-circle'
+                                ];
+                                $icon = $iconMap[$actionType] ?? 'info-circle';
+                            ?>
+                                <div class="log-item">
+                                    <div class="log-icon <?php echo $actionType; ?>">
+                                        <i class="fas fa-<?php echo $icon; ?>"></i>
+                                    </div>
+                                    <div class="log-content">
+                                        <div class="log-header">
+                                            <div class="log-action">
+                                                <?php echo htmlspecialchars($log['action']); ?>
+                                            </div>
+                                            <span class="log-badge badge-<?php 
+                                                echo match($actionType) {
+                                                    'create', 'join', 'login' => 'success',
+                                                    'update' => 'info',
+                                                    'delete' => 'danger',
+                                                    'logout' => 'secondary',
+                                                    default => 'info'
+                                                };
+                                            ?>">
+                                                <?php echo ucfirst($actionType); ?>
+                                            </span>
+                                        </div>
+                                        <?php if (!empty($log['description'])): ?>
+                                            <div class="log-description">
+                                                <?php echo htmlspecialchars($log['description']); ?>
+                                            </div>
+                                        <?php endif; ?>
+                                        <div class="log-footer">
+                                            <div class="log-time">
+                                                <i class="fas fa-clock"></i>
+                                                <?php echo formatDateTime($log['created_at']); ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
                         <?php else: ?>
                             <div class="empty-state">
-                                <div class="empty-state-icon">📜</div>
+                                <div class="empty-icon">
+                                    <i class="fas fa-inbox"></i>
+                                </div>
                                 <h3>No Activity Yet</h3>
-                                <p>Your activity log is empty.</p>
+                                <p>Your activity log is empty. Start using the system to see your history here.</p>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -100,7 +141,12 @@ try {
             </div>
         </div>
     </div>
-    
-    <script src="<?php echo JS_PATH; ?>main.js"></script>
+
+    <!-- Scripts -->
+    <script>
+        window.BASE_URL = '<?php echo BASE_URL; ?>';
+    </script>
+    <script src="<?php echo JS_PATH; ?>main.js?v=<?php echo time(); ?>"></script>
+    <script src="<?php echo JS_PATH; ?>navigation.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>
