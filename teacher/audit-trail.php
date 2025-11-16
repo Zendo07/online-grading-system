@@ -8,7 +8,6 @@ requireTeacher();
 
 $teacher_id = $_SESSION['user_id'];
 
-// Get audit logs
 try {
     $stmt = $conn->prepare("
         SELECT * FROM audit_logs 

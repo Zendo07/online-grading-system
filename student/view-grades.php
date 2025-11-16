@@ -1,8 +1,4 @@
 <?php
-/**
- * View Grades - Spreadsheet Style
- * File: student/view-grades.php
- */
 
 require_once '../includes/config.php';
 require_once '../includes/session.php';
@@ -18,7 +14,6 @@ if (empty($class_id)) {
     exit();
 }
 
-// Get course details and verify enrollment
 try {
     $stmt = $conn->prepare("
         SELECT 
@@ -71,8 +66,7 @@ try {
         ]
     ];
     
-    // Calculate overall grade
-    $overallGrade = 88.5; // Sample calculation
+    $overallGrade = 88.5; 
     
 } catch (PDOException $e) {
     error_log("View Grades Error: " . $e->getMessage());

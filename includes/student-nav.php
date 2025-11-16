@@ -1,5 +1,4 @@
 <?php
-// includes/student-nav.php - UPDATED VERSION
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 
@@ -76,7 +75,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </li>
                 
                 <li class="nav-item">
-                    <a href="<?php echo BASE_URL; ?>student/my-grades.php" class="<?php echo $current_page == 'my-grades.php' ? 'active' : ''; ?>">
+                    <a href="<?php echo BASE_URL; ?>student/my-professors.php" class="<?php echo $current_page == 'my-professors.php' ? 'active' : ''; ?>">
                         <span class="nav-icon">
                             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -121,23 +120,22 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </li>
                 
                 <li class="nav-item logout">
-                    <a href="<?php echo BASE_URL; ?>auth/logout.php" onclick="return confirm('Are you sure you want to logout?');">
-                        <span class="nav-icon">
-                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                                <polyline points="16 17 21 12 16 7"/>
-                                <line x1="21" y1="12" x2="9" y2="12"/>
-                            </svg>
-                        </span>
-                        <span class="nav-text">Logout</span>
-                    </a>
-                </li>
+    <a href="<?php echo BASE_URL; ?>auth/logout.php">
+        <span class="nav-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+        </span>
+        <span class="nav-text">Logout</span>
+    </a>
+</li>
             </ul>
         </div>
     </div>
 </aside>
 
-<!-- Overlay for mobile -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <!-- Load Enhanced Styles and Scripts -->

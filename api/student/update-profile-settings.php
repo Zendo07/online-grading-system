@@ -1,19 +1,13 @@
 <?php
-/**
- * API: Update Profile Settings
- * Handle student profile information updates
- */
 
 require_once '../../includes/config.php';
 require_once '../../includes/session.php';
 require_once '../../includes/functions.php';
 
-// Require student access
 requireStudent();
 
 header('Content-Type: application/json');
 
-// Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'message' => 'Invalid request method']);
     exit();
@@ -109,7 +103,6 @@ try {
         $user_id
     ]);
 
-    // Update session variables
     $_SESSION['full_name'] = $full_name;
     $_SESSION['email'] = $email;
 

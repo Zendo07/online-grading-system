@@ -1,21 +1,15 @@
 <?php
-/**
- * Account Settings Page - Student Profile Management
- * Allow students to update their profile and change password
- */
 
 require_once '../includes/config.php';
 require_once '../includes/session.php';
 require_once '../includes/functions.php';
 
-// Require student access
 requireStudent();
 
 $student_id = $_SESSION['user_id'];
 $student_info = null;
 
 try {
-    // Get student information
     $stmt = $conn->prepare("
         SELECT 
             user_id,
@@ -38,7 +32,6 @@ try {
         redirectWithMessage(BASE_URL . 'student/dashboard.php', 'danger', 'Student information not found.');
     }
     
-    // Parse full name into components
     $name_parts = explode(' ', $student_info['full_name']);
     $first_name = $name_parts[0] ?? '';
     $last_name = end($name_parts);
@@ -73,7 +66,7 @@ try {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="<?php echo CSS_PATH; ?>style.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="<?php echo CSS_PATH; ?>navigation.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="<?php echo CSS_PATH; ?>account-settings.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="<?php echo CSS_PATH; ?>student-pages/account-settings.css?v=<?php echo time(); ?>">
 </head>
 <body>
     <div class="dashboard-wrapper">
@@ -81,33 +74,30 @@ try {
         
         <div class="main-content">
             <div class="settings-container">
-                <!-- Header -->
                 <div class="settings-header">
                     <h1 class="settings-title">Account Settings</h1>
                     <p class="settings-subtitle">Manage your profile information and security settings</p>
                 </div>
 
-                <!-- Settings Grid -->
                 <div class="settings-grid">
-                    <!-- Profile Information Card -->
-                    <div class="settings-card">
-                        <div class="settings-card-header">
-                            <div class="settings-card-icon">
-                                <i class="fas fa-user-circle"></i>
+                    
+                    <div class="left-column">
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <div class="settings-card-icon">
+                                    <i class="fas fa-camera"></i>
+                                </div>
+                                <h2 class="settings-card-title">Change Profile</h2>
                             </div>
-                            <h2 class="settings-card-title">Profile Information</h2>
-                        </div>
 
-                        <form id="profileForm">
-                            <!-- Profile Picture Section -->
-                            <div class="profile-picture-section">
+                            <div class="profile-picture-section-center">
                                 <div class="profile-picture-preview" id="profilePicturePreview">
                                     <img src="<?php echo $profile_pic_url; ?>" alt="Profile Picture" id="profilePictureImage">
                                     <div class="profile-picture-overlay" id="uploadTrigger">
                                         <i class="fas fa-camera"></i>
                                     </div>
                                 </div>
-                                <div class="profile-picture-actions">
+                                <div class="profile-picture-actions-center">
                                     <button type="button" class="btn-upload-picture" id="btnUploadPicture">
                                         <i class="fas fa-upload"></i> Upload Photo
                                     </button>
@@ -117,8 +107,32 @@ try {
                                 </div>
                                 <input type="file" id="profilePictureInput" accept="image/jpeg,image/png,image/jpg" style="display: none;">
                             </div>
+                        </div>
 
-                            <!-- Name Fields -->
+                        <!-- Change Password Card -->
+                        <div class="settings-card">
+                            <div class="settings-card-header">
+                                <div class="settings-card-icon">
+                                    <i class="fas fa-lock"></i>
+                                </div>
+                                <h2 class="settings-card-title">Security Settings</h2>
+                            </div>
+
+                            <button type="button" class="btn-change-password" id="btnOpenPasswordModal">
+                                <i class="fas fa-key"></i> Change Password
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <div class="settings-card-icon">
+                                <i class="fas fa-user-edit"></i>
+                            </div>
+                            <h2 class="settings-card-title">Edit Profile</h2>
+                        </div>
+
+                        <form id="profileForm">
                             <div class="form-row-3">
                                 <div class="form-group">
                                     <label class="form-label required">First Name</label>
@@ -194,53 +208,11 @@ try {
                             </div>
                         </form>
                     </div>
-
-                    <!-- Quick Info Card -->
-                    <div class="settings-card">
-                        <div class="settings-card-header">
-                            <div class="settings-card-icon">
-                                <i class="fas fa-info-circle"></i>
-                            </div>
-                            <h2 class="settings-card-title">Account Information</h2>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Account Status</label>
-                            <input type="text" class="form-input" value="Active" disabled>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Member Since</label>
-                            <input type="text" class="form-input" 
-                                   value="<?php echo date('F j, Y', strtotime($student_info['created_at'])); ?>" disabled>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Role</label>
-                            <input type="text" class="form-input" value="Student" disabled>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">User ID</label>
-                            <input type="text" class="form-input" value="<?php echo $student_id; ?>" disabled>
-                        </div>
-                    </div>
-
-                    <!-- Password Change Card -->
-                    <div class="settings-card password-card-full">
-                        <div class="settings-card-header">
-                            <div class="settings-card-icon">
-                                <i class="fas fa-lock"></i>
-                            </div>
-                            <h2 class="settings-card-title">Security Settings</h2>
-                        </div>
-
-                        <button type="button" class="btn-change-password" id="btnOpenPasswordModal">
-                            <i class="fas fa-key"></i> Change Password
-                        </button>
-                    </div>
+                    
                 </div>
             </div>
+            
+            <?php include '../includes/footer.php'; ?>
         </div>
     </div>
 
@@ -293,6 +265,6 @@ try {
         window.BASE_URL = '<?php echo BASE_URL; ?>';
     </script>
     <script src="<?php echo JS_PATH; ?>main.js?v=<?php echo time(); ?>"></script>
-    <script src="<?php echo JS_PATH; ?>account-settings.js?v=<?php echo time(); ?>"></script>
+    <script src="<?php echo JS_PATH; ?>student-pages/account-settings.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

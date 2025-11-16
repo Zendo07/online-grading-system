@@ -1,7 +1,4 @@
 <?php
-// Session Management Functions
-
-// Check if user is logged in
 function isLoggedIn() {
     return isset($_SESSION['user_id']) && isset($_SESSION['role']);
 }
@@ -83,8 +80,6 @@ function getCurrentUser($conn) {
 
 function logout() {
     session_start();
-
-    // Store flash message before clearing session
     $_SESSION['flash_message'] = [
         'type' => 'success',
         'message' => 'You have been logged out successfully.'

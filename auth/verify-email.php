@@ -17,7 +17,8 @@ $flash = getFlashMessage();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verify Email - indEx</title>
+    <title>Verify Your Email - indEx</title>
+    <meta name="description" content="Enter the verification code sent to your email to complete your indEx registration.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -32,7 +33,7 @@ $flash = getFlashMessage();
                 </svg>
             </div>
             <h1>Verify Your Email</h1>
-            <p>We've sent a 6-digit verification code to:</p>
+            <p>We've sent a 6-digit verification code from <strong>indEx</strong> to:</p>
             <div class="email-display">
                 <svg class="email-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="currentColor"/>
@@ -64,12 +65,12 @@ $flash = getFlashMessage();
             
             <form action="<?php echo BASE_URL; ?>api/auth/verify-email-handler.php" method="POST" id="verifyForm">
                 <div class="code-inputs">
-                    <input type="text" class="code-input" maxlength="1" id="digit1" name="digit1" required autocomplete="off">
-                    <input type="text" class="code-input" maxlength="1" id="digit2" name="digit2" required autocomplete="off">
-                    <input type="text" class="code-input" maxlength="1" id="digit3" name="digit3" required autocomplete="off">
-                    <input type="text" class="code-input" maxlength="1" id="digit4" name="digit4" required autocomplete="off">
-                    <input type="text" class="code-input" maxlength="1" id="digit5" name="digit5" required autocomplete="off">
-                    <input type="text" class="code-input" maxlength="1" id="digit6" name="digit6" required autocomplete="off">
+                    <input type="text" class="code-input" maxlength="1" id="digit1" name="digit1" required autocomplete="off" inputmode="numeric" pattern="[0-9]">
+                    <input type="text" class="code-input" maxlength="1" id="digit2" name="digit2" required autocomplete="off" inputmode="numeric" pattern="[0-9]">
+                    <input type="text" class="code-input" maxlength="1" id="digit3" name="digit3" required autocomplete="off" inputmode="numeric" pattern="[0-9]">
+                    <input type="text" class="code-input" maxlength="1" id="digit4" name="digit4" required autocomplete="off" inputmode="numeric" pattern="[0-9]">
+                    <input type="text" class="code-input" maxlength="1" id="digit5" name="digit5" required autocomplete="off" inputmode="numeric" pattern="[0-9]">
+                    <input type="text" class="code-input" maxlength="1" id="digit6" name="digit6" required autocomplete="off" inputmode="numeric" pattern="[0-9]">
                 </div>
 
                 <button type="submit" class="verify-btn" id="submitBtn">

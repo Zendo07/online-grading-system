@@ -3,10 +3,8 @@ require_once '../../includes/config.php';
 require_once '../../includes/session.php';
 require_once '../../includes/functions.php';
 
-// Require teacher access
 requireTeacher();
 
-// Check if enrollment_id and class_id are provided
 if (!isset($_GET['enrollment_id']) || !isset($_GET['class_id'])) {
     redirectWithMessage(BASE_URL . 'teacher/manage-students.php', 'danger', 'Invalid request.');
 }
@@ -16,7 +14,6 @@ $class_id = (int)$_GET['class_id'];
 $teacher_id = $_SESSION['user_id'];
 
 try {
-    // Verify teacher owns this class
     $stmt = $conn->prepare("SELECT class_id FROM classes WHERE class_id = ? AND teacher_id = ?");
     $stmt->execute([$class_id, $teacher_id]);
     

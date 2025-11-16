@@ -1,11 +1,9 @@
-/* ===== RESET ===== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* ===== COLOR & TYPOGRAPHY VARIABLES ===== */
 :root {
   --maroon: #7b2d26;
   --maroon-dark: #661f1b;

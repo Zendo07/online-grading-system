@@ -1,5 +1,4 @@
 <?php
-// auth/register.php
 
 // If a role is already passed in URL, redirect immediately
 if (isset($_GET['role'])) {

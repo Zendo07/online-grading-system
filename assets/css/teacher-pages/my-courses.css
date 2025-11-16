@@ -1,5 +1,3 @@
-/* Teacher My Courses - Fixed Version (No Duplication) */
-
 :root {
     --maroon: #7b2d26;
     --maroon-dark: #5a1f18;
@@ -27,17 +25,32 @@ body {
     background: linear-gradient(135deg, var(--cream) 0%, #faf5f3 100%);
     color: var(--gray-dark);
     min-height: 100vh;
-    overflow-x: hidden;
+}
+
+/* ==================== DASHBOARD WRAPPER (FIXED) ==================== */
+.dashboard-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 /* ==================== MAIN CONTENT ==================== */
 .main-content {
     margin-top: 70px;
-    padding: 32px 24px;
+    padding: 0;
+    width: 100%;
+    flex: 1; /* This makes the main content take up available space */
+}
+
+.content-wrapper {
+    padding: 32px 24px 40px;
     max-width: 1400px;
-    margin-left: auto;
-    margin-right: auto;
+    width: 100%;
+    margin: 0 auto;
     animation: fadeIn 0.5s ease;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
 @keyframes fadeIn {
@@ -85,26 +98,24 @@ body {
     border-left: 4px solid #ef4444;
 }
 
-.alert-info {
-    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-    color: #1e40af;
-    border-left: 4px solid #3b82f6;
-}
-
 /* ==================== COURSES SECTION ==================== */
 .courses-section {
-    margin-bottom: 40px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .section-title {
-    font-size: 20px;
+    font-size: clamp(20px, 4vw, 28px);
     font-weight: 700;
     color: var(--maroon);
     margin-bottom: 8px;
 }
 
 .section-subtitle {
-    font-size: 15px;
+    font-size: clamp(14px, 2vw, 16px);
     color: var(--gray-medium);
     margin-bottom: 0;
 }
@@ -113,25 +124,20 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 28px;
     gap: 16px;
-}
-
-.courses-header-actions {
-    display: flex;
-    gap: 12px;
     flex-wrap: wrap;
 }
 
 .btn {
-    padding: 10px 20px;
+    padding: 12px 24px;
     border: none;
     border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
     transition: var(--transition);
     font-family: 'Poppins', sans-serif;
-    font-size: 14px;
+    font-size: clamp(13px, 2vw, 14px);
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -159,11 +165,23 @@ body {
     color: var(--white);
 }
 
-/* ==================== COURSES GRID ==================== */
+/* ==================== COURSES GRID (RESPONSIVE) ==================== */
 .courses-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+    gap: clamp(16px, 3vw, 24px);
+}
+
+@media (min-width: 640px) {
+    .courses-grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .courses-grid {
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    }
 }
 
 .course-card {
@@ -175,6 +193,7 @@ body {
     display: flex;
     flex-direction: column;
     text-decoration: none;
+    min-height: 220px;
 }
 
 .course-card:hover {
@@ -184,32 +203,26 @@ body {
 
 .course-header {
     background: linear-gradient(135deg, var(--maroon) 0%, var(--maroon-light) 100%);
-    padding: 24px;
+    padding: clamp(20px, 4vw, 24px);
     color: var(--white);
 }
 
 .course-code {
-    font-size: 12px;
+    font-size: clamp(11px, 2vw, 12px);
     opacity: 0.9;
     margin-bottom: 8px;
     font-weight: 600;
 }
 
-.course-section {
-    font-size: 13px;
-    opacity: 0.95;
-    margin-top: 4px;
-    font-weight: 500;
-}
-
 .course-name {
-    font-size: 18px;
+    font-size: clamp(16px, 3vw, 18px);
     font-weight: 700;
     margin: 0;
+    line-height: 1.3;
 }
 
 .course-body {
-    padding: 20px;
+    padding: clamp(16px, 3vw, 20px);
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -219,7 +232,9 @@ body {
 .course-info {
     display: flex;
     justify-content: space-between;
-    font-size: 14px;
+    font-size: clamp(13px, 2vw, 14px);
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
 .course-info-item {
@@ -237,34 +252,6 @@ body {
     margin-top: auto;
     padding-top: 16px;
     border-top: 1px solid var(--gray-light);
-    display: flex;
-    gap: 8px;
-}
-
-.course-btn {
-    flex: 1;
-    padding: 10px 12px;
-    border: 1px solid var(--peach);
-    background: transparent;
-    color: var(--maroon);
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 13px;
-    transition: var(--transition);
-    font-family: 'Poppins', sans-serif;
-    text-decoration: none;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-}
-
-.course-btn:hover {
-    background: var(--peach);
-    color: var(--maroon);
-    transform: translateX(4px);
 }
 
 .view-sections-btn {
@@ -274,177 +261,20 @@ body {
     color: var(--maroon);
     border-radius: 6px;
     font-weight: 600;
-    font-size: 13px;
+    font-size: clamp(12px, 2vw, 13px);
     text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-}
-
-/* ==================== SECTIONS GRID ==================== */
-.sections-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 24px;
-}
-
-.section-card {
-    background: var(--white);
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    transition: var(--transition);
-}
-
-.section-card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
-}
-
-.section-header {
-    background: linear-gradient(135deg, var(--maroon) 0%, var(--maroon-light) 100%);
-    padding: 24px;
-    color: var(--white);
-}
-
-.section-name {
-    font-size: 18px;
-    font-weight: 700;
-    margin: 0 0 8px 0;
-}
-
-.section-students {
-    font-size: 14px;
-    opacity: 0.9;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.section-body {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-/* ==================== CLASS CODE DISPLAY ==================== */
-.section-code-display {
-    background: linear-gradient(135deg, var(--cream) 0%, #fef9f5 100%);
-    padding: 12px;
-    border-radius: 8px;
-    border: 2px dashed var(--maroon);
-    display: flex;
-    align-items: center;
     gap: 8px;
-}
-
-.code-label {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--maroon);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.code-value {
-    flex: 1;
-    font-size: 18px;
-    font-weight: 800;
-    color: var(--maroon);
-    letter-spacing: 2px;
-    font-family: 'Courier New', monospace;
-}
-
-.btn-copy-code {
-    padding: 8px 12px;
-    background: var(--maroon);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
     transition: var(--transition);
-    font-size: 14px;
 }
 
-.btn-copy-code:hover {
-    background: var(--maroon-light);
-    transform: scale(1.05);
-}
-
-/* ==================== SECTION SCHEDULES ==================== */
-.section-schedules {
+.course-card:hover .view-sections-btn {
     background: var(--cream);
-    padding: 16px;
-    border-radius: 8px;
-    border: 1px solid var(--peach);
 }
 
-.schedules-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--maroon);
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.schedule-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.schedule-item-display {
-    background: white;
-    padding: 10px 12px;
-    border-radius: 6px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-items: center;
-    font-size: 13px;
-    border: 1px solid var(--gray-light);
-}
-
-.schedule-day {
-    font-weight: 700;
-    color: var(--maroon);
-    min-width: 80px;
-}
-
-.schedule-time {
-    color: var(--gray-dark);
-    font-weight: 600;
-}
-
-.schedule-room {
-    color: var(--gray-medium);
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.schedule-room i {
-    color: var(--maroon);
-}
-
-.no-schedules {
-    text-align: center;
-    padding: 20px;
-    color: var(--gray-medium);
-    font-style: italic;
-}
-
-.section-actions {
-    display: flex;
-    gap: 8px;
-}
-
-/* ==================== CLASS CODE MODAL ==================== */
+/* ==================== MODAL ==================== */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -485,14 +315,14 @@ body {
 }
 
 .modal-header {
-    padding: 32px 32px 24px;
+    padding: clamp(24px, 5vw, 32px) clamp(24px, 5vw, 32px) clamp(20px, 4vw, 24px);
     text-align: center;
     border-bottom: 2px solid var(--gray-light);
 }
 
 .success-icon {
-    width: 80px;
-    height: 80px;
+    width: clamp(60px, 15vw, 80px);
+    height: clamp(60px, 15vw, 80px);
     background: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
     border-radius: 50%;
     display: flex;
@@ -503,52 +333,42 @@ body {
 }
 
 @keyframes scaleIn {
-    0% {
-        transform: scale(0);
-    }
-    50% {
-        transform: scale(1.1);
-    }
-    100% {
-        transform: scale(1);
-    }
+    0% { transform: scale(0); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
 }
 
 .success-icon i {
-    font-size: 40px;
+    font-size: clamp(30px, 8vw, 40px);
     color: white;
 }
 
 .modal-header h2 {
-    font-size: 24px;
+    font-size: clamp(18px, 4vw, 24px);
     font-weight: 700;
     color: var(--gray-dark);
     margin: 0;
 }
 
 .modal-body {
-    padding: 24px 32px;
+    padding: clamp(20px, 4vw, 24px) clamp(24px, 5vw, 32px);
 }
 
 .class-info {
     text-align: center;
     margin-bottom: 24px;
-    font-size: 16px;
+    font-size: clamp(14px, 3vw, 16px);
     color: var(--gray-medium);
 }
 
 .class-info strong {
     color: var(--maroon);
-    font-size: 18px;
-}
-
-.code-display-large {
-    margin-bottom: 20px;
+    font-size: clamp(16px, 3.5vw, 18px);
 }
 
 .code-display-large .code-label {
     text-align: center;
-    font-size: 14px;
+    font-size: clamp(12px, 2.5vw, 14px);
     font-weight: 600;
     color: var(--gray-medium);
     margin-bottom: 12px;
@@ -558,32 +378,34 @@ body {
     background: linear-gradient(135deg, var(--cream) 0%, #fef9f5 100%);
     border: 3px dashed var(--maroon);
     border-radius: 12px;
-    padding: 20px;
+    padding: clamp(16px, 4vw, 20px);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+    flex-wrap: wrap;
 }
 
 .code-text {
-    font-size: 32px;
+    font-size: clamp(24px, 6vw, 32px);
     font-weight: 800;
     color: var(--maroon);
-    letter-spacing: 4px;
+    letter-spacing: clamp(2px, 1vw, 4px);
     font-family: 'Courier New', monospace;
     flex: 1;
     text-align: center;
+    min-width: 150px;
 }
 
 .btn-copy-large {
-    padding: 12px 20px;
+    padding: clamp(10px, 2vw, 12px) clamp(16px, 3vw, 20px);
     background: var(--maroon);
     color: white;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     font-weight: 700;
-    font-size: 14px;
+    font-size: clamp(12px, 2.5vw, 14px);
     transition: var(--transition);
     display: flex;
     align-items: center;
@@ -604,6 +426,7 @@ body {
     display: flex;
     gap: 12px;
     align-items: flex-start;
+    margin-top: 20px;
 }
 
 .code-instructions i {
@@ -614,25 +437,25 @@ body {
 }
 
 .code-instructions p {
-    font-size: 13px;
+    font-size: clamp(12px, 2vw, 13px);
     color: #1e40af;
     line-height: 1.5;
     margin: 0;
 }
 
 .modal-footer {
-    padding: 20px 32px 32px;
+    padding: clamp(16px, 3vw, 20px) clamp(24px, 5vw, 32px) clamp(24px, 5vw, 32px);
     text-align: center;
 }
 
 .btn-modal-close {
-    padding: 14px 40px;
+    padding: clamp(12px, 3vw, 14px) clamp(32px, 7vw, 40px);
     background: linear-gradient(135deg, var(--maroon) 0%, var(--maroon-light) 100%);
     color: white;
     border: none;
     border-radius: 10px;
     font-weight: 700;
-    font-size: 16px;
+    font-size: clamp(14px, 3vw, 16px);
     cursor: pointer;
     transition: var(--transition);
 }
@@ -645,21 +468,21 @@ body {
 /* ==================== EMPTY STATE ==================== */
 .empty-state {
     text-align: center;
-    padding: 60px 24px;
+    padding: clamp(40px, 8vw, 60px) clamp(16px, 4vw, 24px);
     background: var(--white);
     border-radius: 16px;
     box-shadow: var(--shadow);
 }
 
 .empty-state i {
-    font-size: 80px;
+    font-size: clamp(60px, 12vw, 80px);
     color: var(--maroon);
     opacity: 0.3;
     margin-bottom: 24px;
 }
 
 .empty-state h3 {
-    font-size: 24px;
+    font-size: clamp(20px, 4vw, 24px);
     color: var(--maroon);
     margin-bottom: 12px;
 }
@@ -667,37 +490,13 @@ body {
 .empty-state p {
     color: var(--gray-medium);
     margin-bottom: 24px;
-    font-size: 16px;
-}
-
-/* ==================== FOOTER ==================== */
-.footer {
-    background: var(--maroon);
-    color: var(--white);
-    padding: 24px;
-    text-align: center;
-    margin-top: 40px;
-    font-size: 14px;
-}
-
-.footer p {
-    margin: 0;
-}
-
-.footer a {
-    color: var(--peach);
-    text-decoration: none;
-    transition: var(--transition);
-}
-
-.footer a:hover {
-    text-decoration: underline;
+    font-size: clamp(14px, 3vw, 16px);
 }
 
 /* ==================== RESPONSIVE ==================== */
 @media (max-width: 768px) {
-    .main-content {
-        padding: 20px 16px;
+    .content-wrapper {
+        padding: 24px 16px 40px;
     }
 
     .courses-header {
@@ -705,27 +504,9 @@ body {
         align-items: stretch;
     }
 
-    .courses-header-actions {
-        width: 100%;
-    }
-
     .btn {
         width: 100%;
         justify-content: center;
-    }
-
-    .courses-grid,
-    .sections-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .modal-content {
-        margin: 20px;
-    }
-
-    .code-text {
-        font-size: 24px;
-        letter-spacing: 2px;
     }
 
     .code-box {
@@ -742,23 +523,5 @@ body {
     .course-info {
         flex-direction: column;
         gap: 8px;
-    }
-
-    .section-code-display {
-        flex-wrap: wrap;
-    }
-
-    .code-value {
-        width: 100%;
-        text-align: center;
-    }
-
-    .schedule-item-display {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .schedule-day {
-        min-width: auto;
     }
 }

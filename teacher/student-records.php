@@ -3,7 +3,6 @@ require_once '../includes/config.php';
 require_once '../includes/session.php';
 require_once '../includes/functions.php';
 
-// Require teacher access
 requireTeacher();
 
 $teacher_id = $_SESSION['user_id'];
@@ -44,13 +43,10 @@ if (isset($_GET['student_id']) && isset($_GET['class_id'])) {
                 $stmt->execute([$student_id, $class_id]);
                 $grades = $stmt->fetchAll();
                 
-                // Calculate overall grade
                 $overall_grade = calculateOverallGrade($conn, $student_id, $class_id);
                 
-                // Get missing activities
                 $missing_activities = getMissingActivities($conn, $student_id, $class_id);
                 
-                // Get attendance summary
                 $stmt = $conn->prepare("
                     SELECT 
                         status,
@@ -72,7 +68,6 @@ if (isset($_GET['student_id']) && isset($_GET['class_id'])) {
     }
 }
 
-// Get flash message
 $flash = getFlashMessage();
 ?>
 <!DOCTYPE html>
@@ -108,7 +103,6 @@ $flash = getFlashMessage();
                 <?php endif; ?>
                 
                 <?php if ($student_record): ?>
-                    <!-- Student Information -->
                     <div class="card">
                         <div class="card-header">
                             <h2 class="card-title">Student Information</h2>
@@ -142,7 +136,6 @@ $flash = getFlashMessage();
                         </div>
                     </div>
                     
-                    <!-- Overall Grade Summary -->
                     <?php if ($overall_grade): ?>
                     <div class="card">
                         <div class="card-header">
@@ -179,7 +172,6 @@ $flash = getFlashMessage();
                     </div>
                     <?php endif; ?>
                     
-                    <!-- Missing Activities Alert -->
                     <?php if (count($missing_activities) > 0): ?>
                     <div class="card">
                         <div class="card-header">
@@ -217,7 +209,6 @@ $flash = getFlashMessage();
                     </div>
                     <?php endif; ?>
                     
-                    <!-- Attendance Summary -->
                     <div class="card">
                         <div class="card-header">
                             <h2 class="card-title">Attendance Summary</h2>
@@ -256,7 +247,6 @@ $flash = getFlashMessage();
                         </div>
                     </div>
                     
-                    <!-- Grades by Period -->
                     <div class="card">
                         <div class="card-header">
                             <h2 class="card-title">Grades</h2>

@@ -3,12 +3,10 @@ require_once '../../includes/config.php';
 require_once '../../includes/session.php';
 require_once '../../includes/functions.php';
 
-// Require student access
 requireStudent();
 
 header('Content-Type: application/json');
 
-// Check if file was uploaded
 if (!isset($_FILES['profile_picture'])) {
     echo json_encode(['success' => false, 'message' => 'No file uploaded']);
     exit();

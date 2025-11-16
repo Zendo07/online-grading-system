@@ -1,75 +1,86 @@
 <?php
-/**
- * Create Class Handler - COMPLETE FIXED VERSION
- * File: api/teacher/create-class-handler.php
- */
+error_reporting(E_ALL);
+ini_set('display_errors', 0); 
+ini_set('log_errors', 1);
 
 require_once '../../includes/config.php';
 require_once '../../includes/session.php';
 require_once '../../includes/functions.php';
 
-// Require teacher access
 requireTeacher();
 
-// Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    error_log("❌ Not a POST request");
     header('Location: ' . BASE_URL . 'teacher/create-class.php');
     exit();
 }
 
-// Get teacher ID from session
 $teacher_id = $_SESSION['user_id'];
 
 // Get and sanitize input
 $class_name = trim(sanitize($_POST['class_name']));
 $subject = trim(sanitize($_POST['subject']));
 $section = trim(sanitize($_POST['section']));
-
-// Get schedules array if provided
 $schedules = isset($_POST['schedules']) ? $_POST['schedules'] : [];
+
+error_log("=== CREATE CLASS ATTEMPT ===");
+error_log("Teacher ID: " . $teacher_id);
+error_log("Class Name: " . $class_name);
+error_log("Subject: " . $subject);
+error_log("Section: " . $section);
+error_log("Schedules Received: " . count($schedules));
+error_log("Schedules Data: " . print_r($schedules, true));
 
 // Validation
 $errors = [];
 
 if (empty($class_name)) {
     $errors[] = 'Class name is required.';
+    error_log("❌ Class name empty");
 }
 
 if (empty($subject)) {
     $errors[] = 'Subject is required.';
+    error_log("❌ Subject empty");
 }
 
 if (empty($section)) {
     $errors[] = 'Section is required.';
+    error_log("❌ Section empty");
 }
 
 // Validate schedules if provided
 if (!empty($schedules)) {
     foreach ($schedules as $index => $schedule) {
-        // Check if any field in this schedule is filled
+        error_log("Validating schedule #" . ($index + 1) . ": " . print_r($schedule, true));
+        
         if (!empty($schedule['day']) || !empty($schedule['start_time']) || !empty($schedule['end_time'])) {
             if (empty($schedule['day'])) {
                 $errors[] = "Schedule #" . ($index + 1) . ": Day is required.";
+                error_log("❌ Schedule #" . ($index + 1) . ": Day missing");
             }
             if (empty($schedule['start_time'])) {
                 $errors[] = "Schedule #" . ($index + 1) . ": Start time is required.";
+                error_log("❌ Schedule #" . ($index + 1) . ": Start time missing");
             }
             if (empty($schedule['end_time'])) {
                 $errors[] = "Schedule #" . ($index + 1) . ": End time is required.";
+                error_log("❌ Schedule #" . ($index + 1) . ": End time missing");
             }
             
-            // Validate time logic
             if (!empty($schedule['start_time']) && !empty($schedule['end_time'])) {
                 if ($schedule['start_time'] >= $schedule['end_time']) {
                     $errors[] = "Schedule #" . ($index + 1) . ": End time must be after start time.";
+                    error_log("❌ Schedule #" . ($index + 1) . ": Invalid time range");
                 }
             }
         }
     }
 }
 
-// If there are validation errors, return to form
+// Return errors if validation fails
 if (!empty($errors)) {
+    error_log("❌ Validation failed: " . implode(', ', $errors));
     $_SESSION['form_errors'] = $errors;
     $_SESSION['form_data'] = $_POST;
     header('Location: ' . BASE_URL . 'teacher/create-class.php');
@@ -77,28 +88,23 @@ if (!empty($errors)) {
 }
 
 try {
-    // Start database transaction
+    // Start transaction
     $conn->beginTransaction();
+    error_log("✓ Transaction started");
     
     // Generate unique class code
     $class_code = generateUniqueClassCode($conn, 'PSU');
+    error_log("✓ Generated code: " . $class_code);
     
-    // Log for debugging
-    error_log("=== CREATE CLASS START ===");
-    error_log("Teacher ID: " . $teacher_id);
-    error_log("Class Name: " . $class_name);
-    error_log("Subject: " . $subject);
-    error_log("Section: " . $section);
-    error_log("Generated Class Code: " . $class_code);
-    
-    // Double-check the code is unique
-    $check_stmt = $conn->prepare("SELECT class_id FROM classes WHERE class_code = ?");
-    $check_stmt->execute([$class_code]);
-    if ($check_stmt->rowCount() > 0) {
+    // Verify code is unique
+    $checkStmt = $conn->prepare("SELECT class_id FROM classes WHERE class_code = ?");
+    $checkStmt->execute([$class_code]);
+    if ($checkStmt->rowCount() > 0) {
         throw new Exception("Generated class code is not unique: {$class_code}");
     }
+    error_log("✓ Code uniqueness verified");
     
-    // Insert class into database
+    // Insert class
     $stmt = $conn->prepare("
         INSERT INTO classes (
             teacher_id, 
@@ -120,37 +126,41 @@ try {
     ]);
     
     if (!$result) {
-        throw new Exception("Failed to insert class into database");
+        throw new Exception("Failed to insert class");
     }
     
-    // Get the newly created class ID
+    // Get class ID
     $class_id = $conn->lastInsertId();
     
     if (!$class_id) {
-        throw new Exception("Failed to retrieve class ID after insertion");
+        throw new Exception("Failed to retrieve class ID");
     }
     
-    error_log("Class inserted with ID: " . $class_id);
+    error_log("✓ Class created with ID: " . $class_id);
     
-    // Verify the class code was actually saved
-    $verify_stmt = $conn->prepare("SELECT class_code, class_name FROM classes WHERE class_id = ?");
-    $verify_stmt->execute([$class_id]);
-    $verified = $verify_stmt->fetch(PDO::FETCH_ASSOC);
+    // Verify class was inserted
+    $verifyStmt = $conn->prepare("SELECT class_code FROM classes WHERE class_id = ?");
+    $verifyStmt->execute([$class_id]);
+    $verified = $verifyStmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$verified || $verified['class_code'] !== $class_code) {
-        throw new Exception("Class code verification failed. Expected: {$class_code}, Got: " . ($verified['class_code'] ?? 'NULL'));
+        throw new Exception("Class insertion verification failed");
     }
     
-    error_log("Class code verified: " . $verified['class_code']);
+    error_log("✓ Class insertion verified");
     
-    // Insert schedules if provided (using 'schedules' table from your database)
+    // Insert schedules into class_schedules table
     $schedule_count = 0;
     if (!empty($schedules)) {
-        foreach ($schedules as $schedule) {
-            // Only insert if all required fields are present
+        error_log("📅 Processing " . count($schedules) . " schedule(s)");
+        
+        foreach ($schedules as $index => $schedule) {
+            error_log("Processing schedule #" . ($index + 1) . ": " . print_r($schedule, true));
+            
             if (!empty($schedule['day']) && !empty($schedule['start_time']) && !empty($schedule['end_time'])) {
-                $schedule_stmt = $conn->prepare("
-                    INSERT INTO schedules (
+                
+                $scheduleStmt = $conn->prepare("
+                    INSERT INTO class_schedules (
                         class_id, 
                         day_of_week, 
                         start_time, 
@@ -160,37 +170,41 @@ try {
                     ) VALUES (?, ?, ?, ?, ?, NOW())
                 ");
                 
-                $schedule_result = $schedule_stmt->execute([
+                $room = isset($schedule['room']) ? trim($schedule['room']) : null;
+                
+                $scheduleResult = $scheduleStmt->execute([
                     $class_id,
                     $schedule['day'],
                     $schedule['start_time'],
                     $schedule['end_time'],
-                    isset($schedule['room']) ? trim($schedule['room']) : null
+                    $room
                 ]);
                 
-                if ($schedule_result) {
+                if ($scheduleResult) {
                     $schedule_count++;
-                    error_log("Schedule inserted: {$schedule['day']} {$schedule['start_time']}-{$schedule['end_time']}");
+                    error_log("✓ Schedule #" . ($index + 1) . " inserted: {$schedule['day']} {$schedule['start_time']}-{$schedule['end_time']}");
+                } else {
+                    error_log("❌ Failed to insert schedule #" . ($index + 1));
+                    $errorInfo = $scheduleStmt->errorInfo();
+                    error_log("SQL Error: " . print_r($errorInfo, true));
                 }
+            } else {
+                error_log("⚠️ Schedule #" . ($index + 1) . " skipped - incomplete data");
             }
         }
+    } else {
+        error_log("ℹ️ No schedules to process");
     }
     
-    error_log("Total schedules inserted: " . $schedule_count);
+    error_log("✓ Total schedules inserted: " . $schedule_count);
     
-    // Log audit trail
+    // Verify schedules were inserted
+    $verifySchedulesStmt = $conn->prepare("SELECT COUNT(*) as count FROM class_schedules WHERE class_id = ?");
+    $verifySchedulesStmt->execute([$class_id]);
+    $scheduleVerify = $verifySchedulesStmt->fetch(PDO::FETCH_ASSOC);
+    error_log("✓ Schedules in database: " . $scheduleVerify['count']);
+    
     if (function_exists('logAudit')) {
-        $log_details = json_encode([
-            'class_id' => $class_id,
-            'class_code' => $class_code,
-            'class_name' => $class_name,
-            'subject' => $subject,
-            'section' => $section,
-            'schedule_count' => $schedule_count,
-            'ip_address' => $_SERVER['REMOTE_ADDR'] ?? 'Unknown',
-            'timestamp' => date('Y-m-d H:i:s')
-        ]);
-        
         logAudit(
             $conn,
             $teacher_id,
@@ -198,61 +212,64 @@ try {
             'create',
             'classes',
             $class_id,
-            $log_details
+            json_encode([
+                'class_id' => $class_id,
+                'class_code' => $class_code,
+                'class_name' => $class_name,
+                'subject' => $subject,
+                'section' => $section,
+                'schedule_count' => $schedule_count,
+                'timestamp' => date('Y-m-d H:i:s')
+            ])
         );
+        error_log("✓ Audit log created");
     }
     
-    // Commit the transaction
     $conn->commit();
+    error_log("✓ Transaction committed");
     
-    error_log("Transaction committed successfully");
-    
-    // Store success data in session for the success modal
+    // Store data in session for modal
     $_SESSION['new_class_code'] = $class_code;
     $_SESSION['new_class_name'] = $class_name;
     $_SESSION['new_class_section'] = $section;
     
     error_log("=== CREATE CLASS SUCCESS ===");
-    error_log("Redirecting to my-courses.php with code: " . $class_code);
+    error_log("Class ID: " . $class_id);
+    error_log("Class Code: " . $class_code);
+    error_log("Schedules: " . $schedule_count);
     
-    // Redirect with success message
+    // Redirect with success
     setFlashMessage('success', 'Class created successfully!');
     header('Location: ' . BASE_URL . 'teacher/my-courses.php?show_code=1');
     exit();
     
 } catch (PDOException $e) {
-    // Rollback transaction on error
+    // Rollback on error
     if ($conn->inTransaction()) {
         $conn->rollBack();
+        error_log("✓ Transaction rolled back");
     }
     
-    // Log detailed error for debugging
     error_log("=== CREATE CLASS ERROR (PDO) ===");
-    error_log("Error Message: " . $e->getMessage());
     error_log("Error Code: " . $e->getCode());
-    error_log("File: " . $e->getFile());
-    error_log("Line: " . $e->getLine());
+    error_log("Error Message: " . $e->getMessage());
     error_log("Stack trace: " . $e->getTraceAsString());
     
-    // User-friendly error message
-    setFlashMessage('error', 'Database error: Unable to create class. Please try again or contact support.');
+    setFlashMessage('error', 'Database error: ' . $e->getMessage());
     header('Location: ' . BASE_URL . 'teacher/create-class.php');
     exit();
     
 } catch (Exception $e) {
-    // Rollback transaction on error
+    // Rollback on error
     if ($conn->inTransaction()) {
         $conn->rollBack();
+        error_log("✓ Transaction rolled back");
     }
     
-    // Log error
     error_log("=== CREATE CLASS ERROR (General) ===");
     error_log("Error Message: " . $e->getMessage());
-    error_log("File: " . $e->getFile());
-    error_log("Line: " . $e->getLine());
     error_log("Stack trace: " . $e->getTraceAsString());
     
-    // Show specific error to help debugging
     setFlashMessage('error', 'Error: ' . $e->getMessage());
     header('Location: ' . BASE_URL . 'teacher/create-class.php');
     exit();

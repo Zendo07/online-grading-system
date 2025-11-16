@@ -1,33 +1,26 @@
 <?php
-/**
- * Join Class Handler - COMPLETE FIXED VERSION
- * File: api/student/join-class-handler.php
- */
 
 require_once '../../includes/config.php';
 require_once '../../includes/session.php';
 require_once '../../includes/functions.php';
 
-// Require student access
 requireStudent();
 
-// Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ' . BASE_URL . 'student/join-class.php');
     exit();
 }
 
-// Get and sanitize input
 $class_code = strtoupper(trim(sanitize($_POST['class_code'])));
 $student_id = $_SESSION['user_id'];
 
 error_log("=== JOIN CLASS ATTEMPT ===");
 error_log("Student ID: " . $student_id);
 error_log("Class Code: " . $class_code);
+error_log("Timestamp: " . date('Y-m-d H:i:s'));
 
-// Validate input
 if (empty($class_code)) {
-    error_log("Join failed: Empty class code");
+    error_log("✗ Empty class code");
     redirectWithMessage(
         BASE_URL . 'student/join-class.php', 
         'danger', 
@@ -35,21 +28,27 @@ if (empty($class_code)) {
     );
 }
 
-// Validate class code format (alphanumeric and dashes only)
 if (!preg_match('/^[A-Z0-9-]+$/', $class_code)) {
-    error_log("Join failed: Invalid format - " . $class_code);
+    error_log("✗ Invalid format: " . $class_code);
     redirectWithMessage(
         BASE_URL . 'student/join-class.php', 
         'danger', 
-        'Invalid class code format. Please use only letters, numbers, and dashes.'
+        'Invalid class code format.'
     );
 }
 
 try {
-    // Check if class code exists and get class details
+    $conn->beginTransaction();
+    error_log("✓ Transaction started");
+    
+    //Find the class
     $stmt = $conn->prepare("
         SELECT 
-            c.*,
+            c.class_id,
+            c.class_name,
+            c.subject,
+            c.section,
+            c.status,
             u.full_name as teacher_name
         FROM classes c
         JOIN users u ON c.teacher_id = u.user_id
@@ -60,171 +59,234 @@ try {
     $class = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$class) {
-        // Log detailed error for debugging
-        error_log("Join failed: Class not found or inactive - Code: " . $class_code);
-        
-        // Check if class exists but is archived
-        $stmt = $conn->prepare("SELECT class_id, status FROM classes WHERE class_code = ?");
-        $stmt->execute([$class_code]);
-        $archived = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if ($archived) {
-            error_log("Class exists but status is: " . $archived['status']);
-            redirectWithMessage(
-                BASE_URL . 'student/join-class.php', 
-                'danger', 
-                'This class is no longer active. Please contact your teacher.'
-            );
-        }
-        
+        $conn->rollBack();
+        error_log("✗ Class not found or inactive: " . $class_code);
         redirectWithMessage(
             BASE_URL . 'student/join-class.php', 
             'danger', 
-            'Invalid class code. Please check and try again.'
+            'Invalid class code or class is not active.'
         );
     }
     
-    error_log("Class found: ID=" . $class['class_id'] . ", Name=" . $class['class_name']);
+    error_log("✓ Class found: ID=" . $class['class_id'] . ", Name=" . $class['class_name']);
     
-    // Check if student is already enrolled with active status
     $stmt = $conn->prepare("
-        SELECT enrollment_id, status 
-        FROM enrollments 
-        WHERE student_id = ? AND class_id = ? AND status = 'active'
-        LIMIT 1
-    ");
-    $stmt->execute([$student_id, $class['class_id']]);
-    $active_enrollment = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if ($active_enrollment) {
-        error_log("Join failed: Already enrolled - Enrollment ID: " . $active_enrollment['enrollment_id']);
-        redirectWithMessage(
-            BASE_URL . 'student/join-class.php', 
-            'warning', 
-            'You are already enrolled in this class.'
-        );
-    }
-    
-    // Check if student was previously dropped from this class
-    $stmt = $conn->prepare("
-        SELECT enrollment_id, status 
+        SELECT 
+            enrollment_id, 
+            status,
+            enrolled_at,
+            updated_at
         FROM enrollments 
         WHERE student_id = ? AND class_id = ?
-        ORDER BY enrolled_at DESC
+        ORDER BY enrollment_id DESC
         LIMIT 1
     ");
     $stmt->execute([$student_id, $class['class_id']]);
-    $existing_enrollment = $stmt->fetch(PDO::FETCH_ASSOC);
+    $existing = $stmt->fetch(PDO::FETCH_ASSOC);
     
-    if ($existing_enrollment && $existing_enrollment['status'] === 'dropped') {
-        // Reactivate the dropped enrollment
-        $stmt = $conn->prepare("
-            UPDATE enrollments 
-            SET status = 'active', 
-                enrolled_at = NOW() 
-            WHERE enrollment_id = ?
-        ");
-        $stmt->execute([$existing_enrollment['enrollment_id']]);
-        $enrollment_id = $existing_enrollment['enrollment_id'];
-        $action_type = 'reactivated';
+    if ($existing) {
+        error_log("📋 Found existing enrollment: ID=" . $existing['enrollment_id'] . ", Status=" . $existing['status']);
         
-        error_log("Enrollment reactivated: ID=" . $enrollment_id);
+        if ($existing['status'] === 'active') {
+            $conn->rollBack();
+            error_log("⚠️ Already enrolled - Status: active");
+            redirectWithMessage(
+                BASE_URL . 'student/my-courses.php', 
+                'warning', 
+                'You are already enrolled in ' . htmlspecialchars($class['class_name']) . '.'
+            );
+        } else {
+            // Reactivate dropped/archived enrollment
+            error_log("🔄 Reactivating enrollment: " . $existing['enrollment_id']);
+            
+            $stmt = $conn->prepare("
+                UPDATE enrollments 
+                SET status = 'active', 
+                    enrolled_at = NOW(),
+                    updated_at = NOW()
+                WHERE enrollment_id = ? AND student_id = ?
+            ");
+            $result = $stmt->execute([$existing['enrollment_id'], $student_id]);
+            
+            if (!$result) {
+                throw new Exception("Failed to reactivate enrollment");
+            }
+            
+            // Verify update
+            $stmt = $conn->prepare("SELECT status FROM enrollments WHERE enrollment_id = ?");
+            $stmt->execute([$existing['enrollment_id']]);
+            $verify = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($verify['status'] !== 'active') {
+                throw new Exception("Enrollment reactivation verification failed");
+            }
+            
+            error_log("✓ Enrollment reactivated and verified");
+            $enrollment_id = $existing['enrollment_id'];
+            $action_type = 'rejoined';
+        }
     } else {
-        // Create new enrollment
+        error_log("➕ Creating new enrollment");
+        
+        // Double-check for race conditions
+        $stmt = $conn->prepare("
+            SELECT COUNT(*) as count 
+            FROM enrollments 
+            WHERE student_id = ? AND class_id = ?
+        ");
+        $stmt->execute([$student_id, $class['class_id']]);
+        $doubleCheck = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($doubleCheck['count'] > 0) {
+            $conn->rollBack();
+            error_log("⚠️ Race condition detected - enrollment exists");
+            redirectWithMessage(
+                BASE_URL . 'student/my-courses.php', 
+                'warning', 
+                'You are already enrolled in this class.'
+            );
+        }
+        
         $stmt = $conn->prepare("
             INSERT INTO enrollments (student_id, class_id, status, enrolled_at) 
             VALUES (?, ?, 'active', NOW())
         ");
-        $stmt->execute([$student_id, $class['class_id']]);
-        $enrollment_id = $conn->lastInsertId();
-        $action_type = 'joined';
         
-        error_log("New enrollment created: ID=" . $enrollment_id);
+        $result = $stmt->execute([$student_id, $class['class_id']]);
+        
+        if (!$result) {
+            throw new Exception("Failed to create enrollment");
+        }
+        
+        $enrollment_id = $conn->lastInsertId();
+        
+        if (!$enrollment_id) {
+            throw new Exception("Failed to get enrollment ID");
+        }
+        
+        // Verify insertion
+        $stmt = $conn->prepare("
+            SELECT enrollment_id, status 
+            FROM enrollments 
+            WHERE enrollment_id = ?
+        ");
+        $stmt->execute([$enrollment_id]);
+        $verify = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$verify || $verify['status'] !== 'active') {
+            throw new Exception("Enrollment creation verification failed");
+        }
+        
+        error_log("✓ New enrollment created and verified: ID=" . $enrollment_id);
+        $action_type = 'joined';
     }
     
-    // Log the action with detailed information
-    $log_details = json_encode([
-        'class_code' => $class_code,
-        'class_id' => $class['class_id'],
-        'class_name' => $class['class_name'],
-        'subject' => $class['subject'],
-        'section' => $class['section'],
-        'teacher_name' => $class['teacher_name'],
-        'enrollment_id' => $enrollment_id,
-        'action_type' => $action_type,
-        'ip_address' => $_SERVER['REMOTE_ADDR'] ?? 'Unknown',
-        'user_agent' => substr($_SERVER['HTTP_USER_AGENT'] ?? 'Unknown', 0, 255),
-        'timestamp' => date('Y-m-d H:i:s')
-    ]);
+    $stmt = $conn->prepare("
+        SELECT COUNT(*) as count 
+        FROM enrollments 
+        WHERE student_id = ? AND class_id = ?
+    ");
+    $stmt->execute([$student_id, $class['class_id']]);
+    $finalCheck = $stmt->fetch(PDO::FETCH_ASSOC);
     
-    // Log audit if function exists
+    if ($finalCheck['count'] > 1) {
+        $conn->rollBack();
+        error_log("✗ CRITICAL: Multiple enrollments detected (" . $finalCheck['count'] . ")");
+        throw new Exception("Database integrity error: duplicate enrollments detected");
+    }
+    
+    error_log("✓ Final verification passed - exactly 1 enrollment exists");
+    
     if (function_exists('logAudit')) {
+        $log_details = json_encode([
+            'class_code' => $class_code,
+            'class_id' => $class['class_id'],
+            'class_name' => $class['class_name'],
+            'subject' => $class['subject'],
+            'section' => $class['section'],
+            'teacher_name' => $class['teacher_name'],
+            'enrollment_id' => $enrollment_id,
+            'action_type' => $action_type,
+            'ip_address' => $_SERVER['REMOTE_ADDR'] ?? 'Unknown',
+            'timestamp' => date('Y-m-d H:i:s')
+        ]);
+        
         logAudit(
             $conn,
             $student_id,
             ucfirst($action_type) . ' class: ' . $class['class_name'],
-            $action_type === 'joined' ? 'join' : 'update',
+            $action_type === 'joined' ? 'create' : 'update',
             'enrollments',
             $enrollment_id,
             $log_details
         );
+        
+        error_log("✓ Audit log created");
     }
     
-    // Prepare success message with more details
-    $success_message = $action_type === 'joined' 
-        ? 'Successfully joined ' . htmlspecialchars($class['subject']) . ' - ' . 
-          htmlspecialchars($class['class_name']) . ' (Section: ' . htmlspecialchars($class['section']) . ')!' 
-        : 'Welcome back! You have been re-enrolled in ' . htmlspecialchars($class['class_name']) . '.';
+    // Commit transaction
+    $conn->commit();
+    error_log("✓ Transaction committed successfully");
     
-    // Store success data in session for better UX
-    $_SESSION['last_joined_class'] = [
-        'class_id' => $class['class_id'],
-        'class_name' => $class['class_name'],
-        'subject' => $class['subject'],
-        'section' => $class['section'],
-        'teacher_name' => $class['teacher_name'],
-        'enrolled_at' => date('Y-m-d H:i:s')
-    ];
+    $success_message = $action_type === 'joined' 
+        ? '🎉 Successfully joined ' . htmlspecialchars($class['class_name']) . 
+          ' (' . htmlspecialchars($class['section']) . ')!' 
+        : '👋 Welcome back! You have been re-enrolled in ' . 
+          htmlspecialchars($class['class_name']) . '.';
     
     error_log("=== JOIN CLASS SUCCESS ===");
-    error_log("Redirecting to dashboard");
+    error_log("Action: " . $action_type);
+    error_log("Enrollment ID: " . $enrollment_id);
+    error_log("Class ID: " . $class['class_id']);
     
-    // Redirect to dashboard with success message
     redirectWithMessage(
-        BASE_URL . 'student/dashboard.php',
+        BASE_URL . 'student/my-courses.php',
         'success',
         $success_message
     );
     
 } catch (PDOException $e) {
-    // Log the detailed error for debugging
+    if ($conn->inTransaction()) {
+        $conn->rollBack();
+        error_log("✓ Transaction rolled back");
+    }
+    
     error_log("=== JOIN CLASS ERROR (PDO) ===");
     error_log("Error Message: " . $e->getMessage());
     error_log("Error Code: " . $e->getCode());
-    error_log("File: " . $e->getFile());
-    error_log("Line: " . $e->getLine());
+    error_log("SQL State: " . ($e->errorInfo[0] ?? 'Unknown'));
     error_log("Stack trace: " . $e->getTraceAsString());
-    error_log("Class Code Attempted: " . $class_code);
-    error_log("Student ID: " . $student_id);
     
-    // User-friendly error message
+    // Handle duplicate entry errors
+    if ($e->getCode() == 23000 || strpos($e->getMessage(), 'Duplicate entry') !== false) {
+        error_log("⚠️ Duplicate entry detected by database");
+        redirectWithMessage(
+            BASE_URL . 'student/my-courses.php', 
+            'warning', 
+            'You are already enrolled in this class.'
+        );
+    }
+    
     redirectWithMessage(
         BASE_URL . 'student/join-class.php', 
         'danger', 
-        'An error occurred while joining the class. Please try again or contact support if the problem persists.'
+        'Database error occurred. Please try again.'
     );
+    
 } catch (Exception $e) {
-    // Catch any other exceptions
+    if ($conn->inTransaction()) {
+        $conn->rollBack();
+        error_log("✓ Transaction rolled back");
+    }
+    
     error_log("=== JOIN CLASS ERROR (General) ===");
     error_log("Error Message: " . $e->getMessage());
-    error_log("File: " . $e->getFile());
-    error_log("Line: " . $e->getLine());
     error_log("Stack trace: " . $e->getTraceAsString());
     
     redirectWithMessage(
         BASE_URL . 'student/join-class.php', 
         'danger', 
-        'An unexpected error occurred. Please try again later.'
+        'An unexpected error occurred. Please try again.'
     );
 }
 ?>

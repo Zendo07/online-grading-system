@@ -28,7 +28,6 @@ $flash = getFlashMessage();
         <div class="main-content">
             <div class="create-class-container">
                 
-                <!-- Page Header -->
                 <div class="page-header">
                     <div class="header-content">
                         <a href="my-courses.php" class="back-button">
@@ -53,7 +52,6 @@ $flash = getFlashMessage();
                 <?php endif; ?>
                 
                 <div class="content-layout">
-                    <!-- Form Card -->
                     <div class="form-card">
                         <div class="card-header-modern">
                             <div class="header-icon-wrapper">
@@ -148,7 +146,6 @@ $flash = getFlashMessage();
                                     </div>
 
                                     <div id="schedulesContainer" class="schedules-container">
-                                        <!-- Schedule items will be added here dynamically -->
                                     </div>
                                 </div>
                                 
@@ -179,7 +176,6 @@ $flash = getFlashMessage();
                         </div>
                     </div>
                     
-                    <!-- Instructions Card -->
                     <div class="instructions-card">
                         <div class="card-header-modern">
                             <div class="header-icon-wrapper">
@@ -241,7 +237,7 @@ $flash = getFlashMessage();
                                     </div>
                                     <h5 class="feature-title">Flexible Schedules</h5>
                                     <p class="feature-text">Multiple time slots</p>
-                                </div>
+                                    </div>
                                 
                                 <div class="feature-item">
                                     <div class="feature-icon">
@@ -249,7 +245,7 @@ $flash = getFlashMessage();
                                     </div>
                                     <h5 class="feature-title">Easy Management</h5>
                                     <p class="feature-text">Control student access</p>
-                                    </div>
+                                </div>
                                 
                                 <div class="feature-item">
                                     <div class="feature-icon">
@@ -266,7 +262,160 @@ $flash = getFlashMessage();
         </div>
     </div>
     
+    <script>
+    console.log('🟢 INLINE SCRIPT STARTING');
+    
+    let scheduleCount = 0;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🟢 DOM LOADED');
+        
+        // Get button and container
+        const addBtn = document.getElementById('addScheduleBtn');
+        const container = document.getElementById('schedulesContainer');
+        
+        console.log('Button found:', addBtn);
+        console.log('Container found:', container);
+        
+        if (!addBtn || !container) {
+            console.error('❌ ELEMENTS NOT FOUND!');
+            return;
+        }
+        
+        // Add click event
+        addBtn.onclick = function(e) {
+            e.preventDefault();
+            console.log('🟢 BUTTON CLICKED! Adding schedule...');
+            addSchedule();
+        };
+        
+        console.log('✅ Event listener attached');
+        
+        // Function to add schedule
+        function addSchedule() {
+            scheduleCount++;
+            console.log('Adding schedule #' + scheduleCount);
+            
+            const html = `
+                <div class="schedule-item" data-schedule-id="${scheduleCount}">
+                    <div class="schedule-item-header">
+                        <span class="schedule-badge">Schedule ${scheduleCount}</span>
+                        <button type="button" class="btn-remove-schedule" onclick="removeSchedule(${scheduleCount})">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="schedule-item-body">
+                        <div class="schedule-row">
+                            <div class="schedule-col">
+                                <label class="schedule-label">
+                                    <i class="fas fa-calendar-day"></i>
+                                    Day
+                                </label>
+                                <select name="schedules[${scheduleCount}][day]" class="schedule-select" required>
+                                    <option value="">Select Day</option>
+                                    <option value="Monday">Monday</option>
+                                    <option value="Tuesday">Tuesday</option>
+                                    <option value="Wednesday">Wednesday</option>
+                                    <option value="Thursday">Thursday</option>
+                                    <option value="Friday">Friday</option>
+                                    <option value="Saturday">Saturday</option>
+                                    <option value="Sunday">Sunday</option>
+                                </select>
+                            </div>
+                            
+                            <div class="schedule-col">
+                                <label class="schedule-label">
+                                    <i class="fas fa-clock"></i>
+                                    Start Time
+                                </label>
+                                <input 
+                                    type="time" 
+                                    name="schedules[${scheduleCount}][start_time]" 
+                                    class="schedule-input"
+                                    required
+                                >
+                            </div>
+                            
+                            <div class="schedule-col">
+                                <label class="schedule-label">
+                                    <i class="fas fa-clock"></i>
+                                    End Time
+                                </label>
+                                <input 
+                                    type="time" 
+                                    name="schedules[${scheduleCount}][end_time]" 
+                                    class="schedule-input"
+                                    required
+                                >
+                            </div>
+                        </div>
+                        
+                        <div class="schedule-row">
+                            <div class="schedule-col-full">
+                                <label class="schedule-label">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    Room/Location <span style="color: #999; font-weight: 400;">(Optional)</span>
+                                </label>
+                                <input 
+                                    type="text" 
+                                    name="schedules[${scheduleCount}][room]" 
+                                    class="schedule-input"
+                                    placeholder="e.g., Room 301, Building A"
+                                    maxlength="100"
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', html);
+            
+            const newItem = container.querySelector(`[data-schedule-id="${scheduleCount}"]`);
+            newItem.style.opacity = '0';
+            newItem.style.transform = 'translateY(-20px)';
+            newItem.style.transition = 'all 0.3s ease';
+            
+            setTimeout(function() {
+                newItem.style.opacity = '1';
+                newItem.style.transform = 'translateY(0)';
+            }, 10);
+            
+            console.log('✅ Schedule #' + scheduleCount + ' added!');
+        }
+        
+        // Make removeSchedule global
+        window.removeSchedule = function(id) {
+            console.log('Removing schedule #' + id);
+            const item = document.querySelector(`[data-schedule-id="${id}"]`);
+            if (item) {
+                item.style.opacity = '0';
+                item.style.transform = 'translateX(-100%)';
+                setTimeout(function() {
+                    item.remove();
+                    console.log('✅ Schedule removed');
+                }, 300);
+            }
+        };
+        
+        // Form submit handler
+        document.getElementById('createClassForm').onsubmit = function() {
+            const btn = document.getElementById('submitBtn');
+            const text = btn.querySelector('span');
+            const icon = btn.querySelector('i.fa-check');
+            const loader = btn.querySelector('.btn-loader');
+            
+            if (icon) icon.style.display = 'none';
+            if (text) text.textContent = 'Creating...';
+            if (loader) loader.style.display = 'inline-block';
+            btn.disabled = true;
+        };
+        
+        console.log('✅ READY! Click "Add Schedule" button');
+    });
+    </script>
+    
     <script src="<?php echo JS_PATH; ?>main.js"></script>
-    <script src="<?php echo JS_PATH; ?>create-class-schedule.js"></script>
 </body>
 </html>

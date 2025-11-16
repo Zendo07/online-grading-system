@@ -1,23 +1,16 @@
 <?php
-/**
- * Resend Verification Code Handler - FIXED (JSON Response)
- * Generates and sends a new verification code during registration
- */
 
 require_once '../../includes/config.php';
 require_once '../../includes/functions.php';
 require_once '../../includes/email-config.php';
 
-// Set JSON header
 header('Content-Type: application/json');
 
-// Only allow POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'message' => 'Invalid request method']);
     exit();
 }
 
-// Check if user has pending registration
 if (!isset($_SESSION['pending_registration'])) {
     echo json_encode(['success' => false, 'message' => 'Invalid verification session. Please register again.']);
     exit();
@@ -26,10 +19,8 @@ if (!isset($_SESSION['pending_registration'])) {
 $registration_data = $_SESSION['pending_registration'];
 
 try {
-    // Rate limiting - check if too many recent requests
     $last_resend = $_SESSION['last_resend_time'] ?? 0;
-    $cooldown = 60; // 60 seconds between resends
-    
+    $cooldown = 60; 
     if (time() - $last_resend < $cooldown) {
         $remaining = $cooldown - (time() - $last_resend);
         echo json_encode([
@@ -63,7 +54,6 @@ try {
     $_SESSION['pending_registration']['expires_at'] = $expires_at;
     $_SESSION['last_resend_time'] = time(); // Track last resend time
 
-    // SUCCESS: Return JSON response
     echo json_encode([
         'success' => true, 
         'message' => 'A new verification code has been sent to your email successfully!'

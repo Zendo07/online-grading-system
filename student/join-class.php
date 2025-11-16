@@ -3,7 +3,6 @@ require_once '../includes/config.php';
 require_once '../includes/session.php';
 require_once '../includes/functions.php';
 
-// Require student access
 requireStudent();
 
 $flash = getFlashMessage();
@@ -15,28 +14,12 @@ $flash = getFlashMessage();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Join Class - indEx</title>
     
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
-    <!-- Stylesheets -->
     <link rel="stylesheet" href="<?php echo CSS_PATH; ?>style.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="<?php echo CSS_PATH; ?>navigation.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="<?php echo CSS_PATH; ?>student-pages/join-class.css?v=<?php echo time(); ?>">
-
-    
-    <style>
-        /* Ensure body and main content don't scroll */
-        body {
-            overflow: hidden;
-            height: 100vh;
-        }
-        
-        .main-content {
-            overflow: hidden;
-            height: 100vh;
-        }
-    </style>
 </head>
 <body>
     <div class="dashboard-wrapper">
@@ -51,7 +34,6 @@ $flash = getFlashMessage();
                     </div>
                 <?php endif; ?>
                 
-                <!-- Page Header -->
                 <div class="page-header">
                     <div class="page-header-content">
                         <div class="page-icon">
@@ -64,9 +46,7 @@ $flash = getFlashMessage();
                     </div>
                 </div>
 
-                <!-- Main Content Grid -->
                 <div class="content-grid">
-                    <!-- Join Form Card -->
                     <div class="join-card">
                         <div class="card-visual">
                             <div class="visual-icon">
@@ -91,30 +71,30 @@ $flash = getFlashMessage();
                                     required
                                     maxlength="20"
                                     autocomplete="off"
+                                    aria-label="Enter class code"
                                 >
                                 <span class="input-hint">Enter the 6-12 character code from your instructor</span>
                             </div>
 
-                            <button type="submit" class="btn-submit">
+                            <button type="submit" class="btn-submit" aria-label="Join class">
                                 <span>Join Class Now</span>
-                                <i class="fas fa-arrow-right"></i>
+                                <i class="fas fa-arrow-right" aria-hidden="true"></i>
                             </button>
                         </form>
                     </div>
 
-                    <!-- Slider Container -->
                     <div class="slider-container">
                         <div class="slider-wrapper">
                             <!-- Instructions Card -->
                             <div class="slider-card info-card active">
                                 <div class="info-header">
-                                    <i class="fas fa-lightbulb"></i>
+                                    <i class="fas fa-lightbulb" aria-hidden="true"></i>
                                     <h3>How to Join</h3>
                                 </div>
 
                                 <div class="info-steps">
                                     <div class="step-item">
-                                        <div class="step-number">1</div>
+                                        <div class="step-number" aria-label="Step 1">1</div>
                                         <div class="step-content">
                                             <h4>Get Your Code</h4>
                                             <p>Ask your instructor for the unique class code</p>
@@ -122,7 +102,7 @@ $flash = getFlashMessage();
                                     </div>
 
                                     <div class="step-item">
-                                        <div class="step-number">2</div>
+                                        <div class="step-number" aria-label="Step 2">2</div>
                                         <div class="step-content">
                                             <h4>Enter Code</h4>
                                             <p>Type the code in the form on the left</p>
@@ -130,7 +110,7 @@ $flash = getFlashMessage();
                                     </div>
 
                                     <div class="step-item">
-                                        <div class="step-number">3</div>
+                                        <div class="step-number" aria-label="Step 3">3</div>
                                         <div class="step-content">
                                             <h4>Start Learning</h4>
                                             <p>Access course materials and track your progress</p>
@@ -139,7 +119,7 @@ $flash = getFlashMessage();
                                 </div>
 
                                 <div class="info-tip">
-                                    <i class="fas fa-info-circle"></i>
+                                    <i class="fas fa-info-circle" aria-hidden="true"></i>
                                     <div>
                                         <strong>Pro Tip:</strong> You can join multiple classes. Each class has its own unique code.
                                     </div>
@@ -149,14 +129,14 @@ $flash = getFlashMessage();
                             <!-- Benefits Card -->
                             <div class="slider-card benefits-card">
                                 <div class="benefits-header">
-                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star" aria-hidden="true"></i>
                                     <h3>What You'll Get</h3>
                                 </div>
 
                                 <div class="benefits-list">
                                     <div class="benefit-item">
                                         <div class="benefit-icon">
-                                            <i class="fas fa-chart-line"></i>
+                                            <i class="fas fa-chart-line" aria-hidden="true"></i>
                                         </div>
                                         <div class="benefit-content">
                                             <h4>Real-Time Grades</h4>
@@ -166,7 +146,7 @@ $flash = getFlashMessage();
 
                                     <div class="benefit-item">
                                         <div class="benefit-icon">
-                                            <i class="fas fa-calendar-check"></i>
+                                            <i class="fas fa-calendar-check" aria-hidden="true"></i>
                                         </div>
                                         <div class="benefit-content">
                                             <h4>Attendance Records</h4>
@@ -176,21 +156,21 @@ $flash = getFlashMessage();
 
                                     <div class="benefit-item">
                                         <div class="benefit-icon">
-                                            <i class="fas fa-tasks"></i>
+                                            <i class="fas fa-clock" aria-hidden="true"></i>
                                         </div>
                                         <div class="benefit-content">
-                                            <h4>Assignment Tracking</h4>
-                                            <p>Never miss a submission deadline</p>
+                                            <h4>24/7 Access to Your Academic Records</h4>
+                                            <p>View your grades and progress anytime, anywhere</p>
                                         </div>
                                     </div>
 
                                     <div class="benefit-item">
                                         <div class="benefit-icon">
-                                            <i class="fas fa-comments"></i>
+                                            <i class="fas fa-chart-pie" aria-hidden="true"></i>
                                         </div>
                                         <div class="benefit-content">
-                                            <h4>Direct Communication</h4>
-                                            <p>Stay connected with your instructor</p>
+                                            <h4>Performance Analytics Dashboard</h4>
+                                            <p>Visualize your academic trends and insights</p>
                                         </div>
                                     </div>
                                 </div>
@@ -198,115 +178,31 @@ $flash = getFlashMessage();
                         </div>
 
                         <!-- Slider Navigation -->
-                        <button class="slider-nav prev" id="prevBtn">
-                            <i class="fas fa-chevron-left"></i>
+                        <button class="slider-nav prev" id="prevBtn" aria-label="Previous slide">
+                            <i class="fas fa-chevron-left" aria-hidden="true"></i>
                         </button>
-                        <button class="slider-nav next" id="nextBtn">
-                            <i class="fas fa-chevron-right"></i>
+                        <button class="slider-nav next" id="nextBtn" aria-label="Next slide">
+                            <i class="fas fa-chevron-right" aria-hidden="true"></i>
                         </button>
 
                         <!-- Slider Indicators -->
-                        <div class="slider-indicators">
-                            <button class="indicator active" data-slide="0"></button>
-                            <button class="indicator" data-slide="1"></button>
+                        <div class="slider-indicators" role="tablist" aria-label="Slide navigation">
+                            <button class="indicator active" data-slide="0" aria-label="Go to slide 1" role="tab" aria-selected="true"></button>
+                            <button class="indicator" data-slide="1" aria-label="Go to slide 2" role="tab" aria-selected="false"></button>
                         </div>
                     </div>
                 </div>
             </div>
+            
+            <?php include '../includes/footer.php'; ?>
         </div>
     </div>
 
-    <!-- Scripts -->
     <script>
         window.BASE_URL = '<?php echo BASE_URL; ?>';
     </script>
     <script src="<?php echo JS_PATH; ?>main.js?v=<?php echo time(); ?>"></script>
     <script src="<?php echo JS_PATH; ?>navigation.js?v=<?php echo time(); ?>"></script>
-    <script>
-        // Auto-uppercase and format class code
-        document.getElementById('class_code').addEventListener('input', function(e) {
-            this.value = this.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
-        });
-
-        // Form validation
-        document.getElementById('joinForm').addEventListener('submit', function(e) {
-            const classCode = document.getElementById('class_code').value.trim();
-            
-            if (classCode.length < 6) {
-                e.preventDefault();
-                alert('Class code must be at least 6 characters long.');
-                return false;
-            }
-        });
-
-        // Auto-dismiss alerts after 5 seconds
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(alert => {
-            setTimeout(() => {
-                alert.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                alert.style.opacity = '0';
-                alert.style.transform = 'translateY(-10px)';
-                setTimeout(() => alert.remove(), 500);
-            }, 5000);
-        });
-
-        // Slider functionality
-        let currentSlide = 0;
-        const sliderCards = document.querySelectorAll('.slider-card');
-        const indicators = document.querySelectorAll('.indicator');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-
-        function updateSlider(index) {
-            // Remove active class from all cards and indicators
-            sliderCards.forEach(card => card.classList.remove('active'));
-            indicators.forEach(ind => ind.classList.remove('active'));
-
-            // Add active class to current card and indicator
-            sliderCards[index].classList.add('active');
-            indicators[index].classList.add('active');
-
-            // Update navigation buttons visibility
-            prevBtn.style.opacity = index === 0 ? '0' : '1';
-            prevBtn.style.pointerEvents = index === 0 ? 'none' : 'auto';
-            nextBtn.style.opacity = index === sliderCards.length - 1 ? '0' : '1';
-            nextBtn.style.pointerEvents = index === sliderCards.length - 1 ? 'none' : 'auto';
-
-            currentSlide = index;
-        }
-
-        // Next button
-        nextBtn.addEventListener('click', () => {
-            if (currentSlide < sliderCards.length - 1) {
-                updateSlider(currentSlide + 1);
-            }
-        });
-
-        // Previous button
-        prevBtn.addEventListener('click', () => {
-            if (currentSlide > 0) {
-                updateSlider(currentSlide - 1);
-            }
-        });
-
-        // Indicator buttons
-        indicators.forEach((indicator, index) => {
-            indicator.addEventListener('click', () => {
-                updateSlider(index);
-            });
-        });
-
-        // Initialize slider
-        updateSlider(0);
-
-        // Keyboard navigation
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight' && currentSlide < sliderCards.length - 1) {
-                updateSlider(currentSlide + 1);
-            } else if (e.key === 'ArrowLeft' && currentSlide > 0) {
-                updateSlider(currentSlide - 1);
-            }
-        });
-    </script>
+    <script src="<?php echo JS_PATH; ?>student-pages/join-class.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

@@ -1,5 +1,4 @@
 <?php
-// student/dashboard.php
 require_once '../includes/config.php';
 require_once '../includes/session.php';
 require_once '../includes/functions.php';
@@ -186,15 +185,13 @@ $flash = getFlashMessage();
     <meta name="description" content="Student Dashboard - indEx Online Grading System">
     <title>Student Dashboard - indEx</title>
     
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
-    <!-- Stylesheets -->
     <link rel="stylesheet" href="<?php echo CSS_PATH; ?>style.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="<?php echo CSS_PATH; ?>navigation.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="<?php echo CSS_PATH; ?>dashboard.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="<?php echo CSS_PATH; ?>student-dashboard.css?v=<?php echo time(); ?>">
+    
+    <link rel="stylesheet" href="<?php echo CSS_PATH; ?>student-pages/student-dashboard.css?v=<?php echo time(); ?>">
 </head>
 <body>
     <div class="dashboard-wrapper">
@@ -353,12 +350,8 @@ $flash = getFlashMessage();
             </div>
         </div>
 
-        <div class="footer-v5">
-            <p>&copy; 2025 Pampanga State University. All rights reserved. | <a href="#">FAQs</a> | <a href="#">Support</a></p>
-        </div>
-    </div>
+        <?php include '../includes/footer.php'; ?>
 
-    <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script>
         window.BASE_URL = '<?php echo BASE_URL; ?>';

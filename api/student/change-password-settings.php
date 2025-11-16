@@ -1,19 +1,13 @@
 <?php
-/**
- * API: Change Password Settings
- * Handle password changes with validation
- */
 
 require_once '../../includes/config.php';
 require_once '../../includes/session.php';
 require_once '../../includes/functions.php';
 
-// Require student access
 requireStudent();
 
 header('Content-Type: application/json');
 
-// Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'message' => 'Invalid request method']);
     exit();
@@ -21,12 +15,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $user_id = $_SESSION['user_id'];
 
-// Get input
 $current_password = $_POST['current_password'] ?? '';
 $new_password = $_POST['new_password'] ?? '';
 $confirm_password = $_POST['confirm_password'] ?? '';
 
-// Validation
 $errors = [];
 
 if (empty($current_password)) {
@@ -58,7 +50,6 @@ if (!empty($errors)) {
 }
 
 try {
-    // Get current password hash from database
     $stmt = $conn->prepare("SELECT password FROM users WHERE user_id = ? AND role = 'student'");
     $stmt->execute([$user_id]);
     $user = $stmt->fetch();
@@ -71,7 +62,6 @@ try {
         exit();
     }
 
-    // Verify current password
     if (!password_verify($current_password, $user['password'])) {
         echo json_encode([
             'success' => false,

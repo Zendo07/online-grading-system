@@ -16,7 +16,7 @@ $flash = getFlashMessage();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IndEX - Login to your Account</title>
+    <title>indEx - Login to your Account</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<?php echo CSS_PATH; ?>login-new.css?v=<?php echo time(); ?>">
 </head>
@@ -86,7 +86,7 @@ $flash = getFlashMessage();
             <div class="floating-circles" id="circlesContainer"></div>
             
             <div class="welcome-content">
-                <h1>Welcome to IndEX</h1>
+                <h1>Welcome to indEx</h1>
                 <p>Your pocket-sized library for a digital tomorrow—an online index card that keeps knowledge neat, fast, and always within reach.</p>
                 <p class="tagline">Let's explore a new tomorrow!</p>
             </div>

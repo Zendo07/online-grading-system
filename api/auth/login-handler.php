@@ -1,19 +1,12 @@
 <?php
-/**
- * Login Handler - FIXED
- * Properly loads unique profile picture per user
- */
-
 require_once '../../includes/config.php';
 require_once '../../includes/functions.php';
 
-// Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ' . BASE_URL . 'auth/login.php');
     exit();
 }
 
-// Get and sanitize input
 $email = sanitize($_POST['email']);
 $password = $_POST['password'];
 $remember = isset($_POST['remember']);
@@ -28,7 +21,7 @@ if (!isValidEmail($email)) {
 }
 
 try {
-    // FIXED: Fetch user with profile_picture
+    
     $stmt = $conn->prepare("
         SELECT 
             user_id, 
@@ -91,17 +84,14 @@ try {
     $_SESSION['full_name'] = $user['full_name'];
     $_SESSION['middle_name'] = $user['middle_name'];
     $_SESSION['role'] = $user['role'];
-    $_SESSION['profile_picture'] = $user['profile_picture']; // CRITICAL: Store actual profile_picture from DB
+    $_SESSION['profile_picture'] = $user['profile_picture']; 
     $_SESSION['last_activity'] = time();
     
-    // Set remember me cookie if checked (30 days)
     if ($remember) {
         $token = bin2hex(random_bytes(32));
         setcookie('remember_token', $token, time() + (30 * 24 * 60 * 60), '/');
-        // In production, store this token in database
     }
     
-    // Log the login action
     logAudit($conn, $user['user_id'], 'User logged in', 'login', 'users', $user['user_id'], 'Successful login');
     
     // Redirect based on role to their respective dashboard

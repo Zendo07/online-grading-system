@@ -1,9 +1,3 @@
-/**
- * ====================================
- * EMAIL VERIFICATION - JavaScript (FIXED)
- * ====================================
- */
-
 // DOM Elements
 const codeInputs = document.querySelectorAll('.code-input');
 const verifyForm = document.getElementById('verifyForm');
@@ -20,14 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
     autoDismissAlerts();
 });
 
-/**
- * Setup code input behavior
- */
 function initializeCodeInputs() {
     if (!codeInputs || codeInputs.length === 0) return;
     
     codeInputs.forEach((input, index) => {
-        // Auto-focus next input on entry
         input.addEventListener('input', (e) => {
             const value = e.target.value;
             
@@ -37,14 +27,12 @@ function initializeCodeInputs() {
                 return;
             }
 
-            // Move to next input
             if (value.length === 1 && index < codeInputs.length - 1) {
                 codeInputs[index + 1].focus();
                 codeInputs[index + 1].select();
             }
         });
 
-        // Handle backspace
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Backspace' && !e.target.value && index > 0) {
                 codeInputs[index - 1].focus();
@@ -52,7 +40,6 @@ function initializeCodeInputs() {
             }
         });
 
-        // Handle paste
         input.addEventListener('paste', (e) => {
             e.preventDefault();
             const pastedData = e.clipboardData.getData('text').replace(/\D/g, '');
@@ -63,7 +50,6 @@ function initializeCodeInputs() {
                 });
                 codeInputs[5].focus();
                 
-                // Show success feedback
                 codeInputs.forEach(inp => {
                     inp.style.borderColor = '#10b981';
                 });
@@ -75,21 +61,16 @@ function initializeCodeInputs() {
             }
         });
 
-        // Visual feedback on focus
         input.addEventListener('focus', (e) => {
             e.target.select();
         });
     });
 }
 
-/**
- * Setup form submission
- */
 function initializeFormSubmission() {
     if (!verifyForm) return;
     
     verifyForm.addEventListener('submit', (e) => {
-        // Check if all inputs are filled
         const allFilled = Array.from(codeInputs).every(input => input.value.length === 1);
         
         if (!allFilled) {
@@ -99,7 +80,6 @@ function initializeFormSubmission() {
             return false;
         }
 
-        // Add loading state
         if (submitBtn) {
             submitBtn.classList.add('loading');
             submitBtn.disabled = true;
@@ -110,26 +90,16 @@ function initializeFormSubmission() {
     });
 }
 
-/**
- * Setup resend button - FIXED to prevent form submission
- */
 function initializeResendButton() {
     if (!resendForm) return;
-    
-    // Prevent default form submission and use AJAX instead
     resendForm.addEventListener('submit', (e) => {
         e.preventDefault();
         resendCode();
     });
 }
 
-/**
- * Resend verification code - FIXED with better error handling
- */
 async function resendCode() {
     if (!resendBtn) return;
-    
-    // Prevent multiple clicks
     if (resendBtn.disabled) return;
     
     resendBtn.disabled = true;
@@ -138,12 +108,10 @@ async function resendCode() {
     resendBtn.innerHTML = '<span class="spinner"></span> Sending...';
     
     try {
-        // Build the correct API URL
         const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.indexOf('/auth/'));
         const apiUrl = `${baseUrl}/api/auth/resend-code-handler.php`;
         
-        console.log('Sending request to:', apiUrl); // Debug log
-        
+        console.log('Sending request to:', apiUrl); 
         const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
@@ -152,16 +120,13 @@ async function resendCode() {
             credentials: 'same-origin'
         });
 
-        // Check if response is OK
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         // Get response text first to debug
         const text = await response.text();
-        console.log('Response text:', text); // Debug log
-        
-        // Try to parse JSON
+        console.log('Response text:', text); 
         let result;
         try {
             result = JSON.parse(text);
@@ -193,9 +158,6 @@ async function resendCode() {
     }
 }
 
-/**
- * Countdown timer for resend button
- */
 function startResendCountdown(seconds) {
     let countdown = seconds;
     
@@ -221,9 +183,6 @@ function startResendCountdown(seconds) {
     }, 1000);
 }
 
-/**
- * Show alert message
- */
 function showAlert(type, message) {
     // Remove existing alerts
     const existingAlert = document.querySelector('.alert');
@@ -258,9 +217,6 @@ function showAlert(type, message) {
     }, 5000);
 }
 
-/**
- * Auto-focus first input
- */
 function autoFocusFirstInput() {
     if (codeInputs && codeInputs.length > 0) {
         setTimeout(() => {
@@ -270,9 +226,6 @@ function autoFocusFirstInput() {
     }
 }
 
-/**
- * Auto-dismiss existing alerts
- */
 function autoDismissAlerts() {
     const existingAlerts = document.querySelectorAll('.alert');
     existingAlerts.forEach(alert => {

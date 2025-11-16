@@ -22,7 +22,6 @@
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
   --navbar-height: 64px;
   --sidebar-width: 280px;
-  --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * {
@@ -62,38 +61,33 @@ body {
   gap: 1rem;
 }
 
-/*Hamburger Menu */
+/* CLEAN HAMBURGER MENU - WHITE, NO BACKGROUND */
 .hamburger-menu {
   width: 44px;
   height: 44px;
-  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s var(--transition-smooth);
-  background: rgba(255, 255, 255, 0.1);
+  background: transparent;
   border: none;
+  padding: 8px;
   position: relative;
-  overflow: hidden;
 }
 
-.hamburger-menu::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(255, 255, 255, 0.2);
-  opacity: 0;
-  transition: opacity 0.3s var(--transition-smooth);
-  border-radius: 12px;
+.hamburger-menu::before,
+.hamburger-menu::after {
+  display: none;
+  content: none;
 }
 
-.hamburger-menu:hover::before {
-  opacity: 1;
-}
-
-.hamburger-menu:active {
-  transform: scale(0.95);
+.hamburger-menu:hover,
+.hamburger-menu:active,
+.hamburger-menu:focus {
+  background: transparent;
+  transform: none;
+  box-shadow: none;
+  border: none;
 }
 
 .hamburger-icon {
@@ -110,13 +104,13 @@ body {
 .hamburger-line {
   width: 100%;
   height: 2px;
-  background: var(--white);
+  background: #ffffff;
   border-radius: 2px;
-  transition: all 0.3s var(--transition-smooth);
 }
 
-.hamburger-menu:hover .hamburger-line {
-  background: var(--gold-accent);
+.hamburger-menu:hover .hamburger-line,
+.hamburger-menu:active .hamburger-line {
+  background: #ffffff;
 }
 
 .navbar-logo {
@@ -138,7 +132,6 @@ body {
   color: var(--white);
   text-decoration: none;
   letter-spacing: -0.03em; 
-  transition: color 0.3s var(--transition-smooth);
   padding: 0;
   font-family: "Inter", "Poppins", "Manrope", "SF Pro Display",
     -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -146,7 +139,6 @@ body {
   user-select: none;
   -webkit-font-smoothing: antialiased;
 }
-
 
 .navbar-brand:hover {
   color: var(--white);
@@ -167,7 +159,6 @@ body {
   overflow: hidden;
   cursor: pointer;
   border: 3px solid rgba(255, 255, 255, 0.3);
-  transition: all 0.3s var(--transition-smooth);
   display: block;
   position: relative;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -185,7 +176,6 @@ body {
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   opacity: 0;
-  transition: opacity 0.3s var(--transition-smooth);
 }
 
 .profile-button:hover::before {
@@ -193,7 +183,6 @@ body {
 }
 
 .profile-button:hover {
-  transform: scale(1.1);
   border-color: var(--gold-accent);
 }
 
@@ -215,7 +204,6 @@ body {
   background: var(--white);
   box-shadow: var(--shadow-xl);
   transform: translateX(calc(-1 * var(--sidebar-width)));
-  transition: transform 0.3s var(--transition-smooth);
   z-index: 999;
   overflow: hidden;
   display: flex;
@@ -269,12 +257,6 @@ body {
   background: linear-gradient(135deg, var(--maroon-primary), var(--gold-accent));
   border-radius: 50%;
   display: inline-block;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.2); opacity: 0.8; }
 }
 
 /* Main Navigation - Scrollable */
@@ -320,7 +302,6 @@ body {
   padding: 0.875rem 1.5rem;
   color: var(--gray-700);
   text-decoration: none;
-  transition: all 0.2s var(--transition-smooth);
   position: relative;
   font-size: 0.9375rem;
   font-weight: 500;
@@ -336,7 +317,6 @@ body {
   width: 4px;
   background: linear-gradient(135deg, var(--maroon-primary), var(--gold-accent));
   opacity: 0;
-  transition: opacity 0.2s var(--transition-smooth);
 }
 
 .nav-item a::after {
@@ -349,7 +329,6 @@ body {
   border-radius: 50%;
   opacity: 0;
   transform: scale(0);
-  transition: all 0.2s var(--transition-smooth);
 }
 
 .nav-item a:hover {
@@ -390,7 +369,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s var(--transition-smooth);
 }
 
 .nav-icon svg {
@@ -424,7 +402,6 @@ body {
 
 .sidebar-bottom .nav-item a {
   padding: 0.875rem 1.5rem;
-  transition: all 0.3s var(--transition-smooth);
 }
 
 .sidebar-bottom .nav-item a:hover {
@@ -471,8 +448,6 @@ body {
   background: #fee2e2;
   border-color: #fca5a5;
   padding-left: 1rem;
-  transform: translateX(0);
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
 }
 
 .sidebar-bottom .nav-item.logout a .nav-icon {
@@ -490,7 +465,6 @@ body {
   padding: 0.875rem 1.5rem;
   color: var(--gray-700);
   cursor: pointer;
-  transition: all 0.2s var(--transition-smooth);
   font-size: 0.9375rem;
   font-weight: 500;
 }
@@ -505,7 +479,6 @@ body {
   margin-left: auto;
   width: 18px;
   height: 18px;
-  transition: transform 0.3s var(--transition-smooth);
 }
 
 .dropdown-arrow svg {
@@ -527,7 +500,6 @@ body {
   max-height: 0;
   overflow: hidden;
   opacity: 0;
-  transition: all 0.3s var(--transition-smooth);
   background: var(--gray-50);
 }
 
@@ -554,8 +526,6 @@ body {
   background: rgba(0, 0, 0, 0.5);
   z-index: 998;
   opacity: 0;
-  transition: opacity 0.3s var(--transition-smooth);
-  backdrop-filter: blur(2px);
 }
 
 .sidebar-overlay.show {
@@ -563,19 +533,12 @@ body {
   opacity: 1;
 }
 
-/* ==========================================
-   MAIN CONTENT
-   ========================================== */
 .main-content {
   margin-top: var(--navbar-height);
-  min-height: calc(100vh - var(--navbar-height));
-  transition: margin-left 0.3s var(--transition-smooth);
   padding: 0;
+  
 }
 
-/* ==========================================
-   RESPONSIVE
-   ========================================== */
 @media (max-width: 768px) {
   .navbar-brand {
     font-size: 1.25rem;
@@ -591,41 +554,6 @@ body {
   }
 }
 
-/* ==========================================
-   UTILITIES
-   ========================================== */
-.ripple {
-  position: relative;
-  overflow: hidden;
-}
-
-.ripple::after {
-  content: '';
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
-  width: 100px;
-  height: 100px;
-  margin-top: -50px;
-  margin-left: -50px;
-  top: 50%;
-  left: 50%;
-  animation: ripple-animation 0.6s;
-  opacity: 0;
-}
-
-@keyframes ripple-animation {
-  from {
-    opacity: 1;
-    transform: scale(0);
-  }
-  to {
-    opacity: 0;
-    transform: scale(10);
-  }
-}
-
-/* Badge */
 .nav-badge {
   margin-left: auto;
   background: linear-gradient(135deg, var(--maroon-primary), var(--gold-accent));
@@ -647,4 +575,312 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--gray-400);
+}
+
+#sidebar,
+#sidebarOverlay,
+.sidebar,
+.sidebar-overlay,
+.hamburger-menu,
+.hamburger-line,
+.hamburger-icon,
+.nav-item a,
+.nav-dropdown-menu,
+.nav-dropdown-toggle,
+body,
+.main-content,
+* {
+    transition: none !important;
+    animation: none !important;
+}
+
+.hamburger-menu {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 8px !important;
+    border-radius: 0 !important;
+}
+
+.hamburger-menu::before,
+.hamburger-menu::after {
+    display: none !important;
+    content: none !important;
+}
+
+.hamburger-menu:hover,
+.hamburger-menu:active,
+.hamburger-menu:focus {
+    background: transparent !important;
+    transform: none !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+/* Force white hamburger lines */
+.hamburger-line {
+    background: #ffffff !important;
+    width: 20px !important;
+    height: 2px !important;
+}
+
+.hamburger-menu:hover .hamburger-line,
+.hamburger-menu:active .hamburger-line {
+    background: #ffffff !important;
+}
+
+/* Remove backdrop blur effect */
+.sidebar-overlay,
+#sidebarOverlay {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Instant sidebar transitions */
+.sidebar {
+    transition: none !important;
+    transform: translateX(calc(-1 * var(--sidebar-width))) !important;
+}
+
+.sidebar.show {
+    transform: translateX(0) !important;
+}
+
+.sidebar-overlay {
+    transition: none !important;
+}
+
+.sidebar-overlay.show {
+    opacity: 1 !important;
+}
+
+/* Remove page load animations */
+body {
+    opacity: 1 !important;
+    transition: none !important;
+}
+
+body.loaded {
+    opacity: 1 !important;
+}
+
+/* Remove main content animations */
+.main-content {
+    animation: none !important;
+    transition: none !important;
+}
+
+/* Remove navigation state animations */
+.navigating {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+/* Remove ripple effects completely */
+.ripple-effect,
+.ripple {
+    display: none !important;
+    opacity: 0 !important;
+}
+
+.ripple::after {
+    display: none !important;
+}
+
+/* Simple hover effects only */
+.nav-item a {
+    transition: none !important;
+}
+
+.nav-item a:hover {
+    background: var(--maroon-hover) !important;
+    padding-left: 2rem !important;
+}
+
+.nav-item a:hover .nav-icon {
+    transform: none !important;
+}
+
+/* Instant dropdown behavior */
+.nav-dropdown {
+    transition: none !important;
+}
+
+.nav-dropdown-menu {
+    transition: none !important;
+    max-height: 0 !important;
+    opacity: 0 !important;
+}
+
+.nav-dropdown.active .nav-dropdown-menu {
+    max-height: 1000px !important;
+    opacity: 1 !important;
+}
+
+.dropdown-arrow {
+    transition: none !important;
+}
+
+.nav-dropdown.active .dropdown-arrow {
+    transform: rotate(180deg) !important;
+}
+
+/* Remove profile button animations */
+.profile-button {
+    transition: none !important;
+}
+
+.profile-button::before {
+    transition: none !important;
+}
+
+.profile-button:hover {
+    transform: none !important;
+}
+
+/* Remove all transform effects */
+.nav-icon {
+    transition: none !important;
+    transform: none !important;
+}
+
+.nav-item a::before,
+.nav-item a::after {
+    transition: none !important;
+}
+
+/* Clean bottom navigation */
+.sidebar-bottom .nav-item a {
+    transition: none !important;
+}
+
+.sidebar-bottom .nav-item.logout a:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Ensure instant navigation */
+a {
+    transition: none !important;
+}
+
+/* Mobile responsive - instant */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(calc(-1 * var(--sidebar-width))) !important;
+        transition: none !important;
+    }
+    
+    .sidebar.show {
+        transform: translateX(0) !important;
+    }
+}
+
+/* Logout Modal Styles */
+.logout-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.logout-modal-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.logout-modal {
+    background: white;
+    border-radius: 12px;
+    padding: 32px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.logout-modal-overlay.open .logout-modal {
+    transform: translateY(0);
+}
+
+.logout-modal .modal-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 20px;
+    background-color: #fee2e2;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logout-modal .modal-icon svg {
+    width: 24px;
+    height: 24px;
+    color: #dc2626;
+}
+
+.logout-modal .modal-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #111827;
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.logout-modal .modal-message {
+    font-size: 14px;
+    color: #6b7280;
+    text-align: center;
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+.logout-modal .modal-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.logout-modal .btn {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.logout-modal .btn-cancel {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+.logout-modal .btn-cancel:hover {
+    background-color: #e5e7eb;
+}
+
+.logout-modal .btn-logout {
+    background-color: #dc2626;
+    color: white;
+}
+
+.logout-modal .btn-logout:hover {
+    background-color: #b91c1c;
+}
+
+.logout-modal .btn-logout:active {
+    transform: scale(0.98);
 }

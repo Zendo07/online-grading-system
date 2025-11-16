@@ -1,47 +1,37 @@
 <?php
-/**
- * Email Verification Handler - DEBUG VERSION
- * Use this temporarily to see what's happening
- */
 
 require_once '../../includes/config.php';
 require_once '../../includes/session.php';
 require_once '../../includes/functions.php';
 
-// Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     redirectWithMessage(BASE_URL . 'auth/verify-email.php', 'danger', 'Invalid request method.');
 }
 
-// Combine individual digit inputs into one code
 $entered_code = '';
 for ($i = 1; $i <= 6; $i++) {
     $entered_code .= trim($_POST["digit$i"] ?? '');
 }
 
-// DEBUG: Log what was entered
 error_log("DEBUG - Entered code: " . $entered_code);
 
-// Validate input
 if (empty($entered_code) || strlen($entered_code) !== 6 || !ctype_digit($entered_code)) {
     redirectWithMessage(BASE_URL . 'auth/verify-email.php', 'danger', 'Please enter all 6 digits of the verification code.');
 }
 
-// Check if there's pending registration data
 if (!isset($_SESSION['pending_registration'])) {
     redirectWithMessage(BASE_URL . 'auth/login.php', 'danger', 'No pending registration found. Please register again.');
 }
 
 $registration_data = $_SESSION['pending_registration'];
 
-// DEBUG: Log what's expected
 error_log("DEBUG - Expected code: " . $registration_data['verification_code']);
 error_log("DEBUG - Code expires at: " . $registration_data['expires_at']);
 error_log("DEBUG - Current time: " . date('Y-m-d H:i:s'));
 
 // Verify the code matches
 if ($entered_code !== $registration_data['verification_code']) {
-    // DEBUG: Show detailed error
+    
     redirectWithMessage(
         BASE_URL . 'auth/verify-email.php', 
         'danger', 
@@ -63,7 +53,6 @@ if ($expires_timestamp < $current_timestamp) {
 }
 
 try {
-    // Begin transaction
     $conn->beginTransaction();
     
     // Insert user into database
@@ -134,7 +123,6 @@ try {
         $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown'
     ]);
     
-    // Store verification record
     $stmt = $conn->prepare("
         INSERT INTO email_verifications (
             user_id, 
@@ -186,7 +174,7 @@ try {
     }
     
 } catch (PDOException $e) {
-    // Rollback on error
+
     $conn->rollBack();
     
     error_log("Verification Error: " . $e->getMessage());

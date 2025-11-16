@@ -1,20 +1,12 @@
-/**
- * Student Dashboard V6 - JavaScript
- * Handles charts, animations, and realtime updates
- */
-
 (function() {
     'use strict';
 
     // Configuration
     const CHART_ID = 'gradeChart';
-    const UPDATE_INTERVAL = 30000; // Poll every 30 seconds
+    const UPDATE_INTERVAL = 30000;
     let chartInstance = null;
     let updateInterval = null;
 
-    /**
-     * Initialize dashboard on page load
-     */
     function initDashboard() {
         initChart();
         animateProgressBars();
@@ -26,9 +18,6 @@
         setupRealtimeUpdates();
     }
 
-    /**
-     * Initialize Chart.js grade performance chart
-     */
     function initChart() {
         const canvas = document.getElementById(CHART_ID);
         if (!canvas) return;
@@ -119,9 +108,6 @@
         });
     }
 
-    /**
-     * Setup realtime updates from teacher dashboard
-     */
     function setupRealtimeUpdates() {
         // Poll for updates every UPDATE_INTERVAL
         updateInterval = setInterval(function() {
@@ -129,9 +115,6 @@
         }, UPDATE_INTERVAL);
     }
 
-    /**
-     * Fetch updated dashboard data from server
-     */
     function fetchDashboardUpdates() {
         fetch(window.BASE_URL + 'api/student/get-dashboard-updates.php')
             .then(response => response.json())
@@ -144,9 +127,6 @@
             .catch(error => console.error('Update fetch error:', error));
     }
 
-    /**
-     * Update dashboard statistics
-     */
     function updateDashboardStats(data) {
         // Update stat cards
         updateStatCard('activeCourses', data.active_courses);
@@ -166,9 +146,6 @@
         }
     }
 
-    /**
-     * Update a stat card value
-     */
     function updateStatCard(elementId, value) {
         const element = document.getElementById(elementId);
         if (!element || element.textContent === value) return;
@@ -182,9 +159,6 @@
         }, 100);
     }
 
-    /**
-     * Update subject performance section
-     */
     function updateSubjectPerformance(subjects) {
         const container = document.querySelector('.progress-list-v5');
         if (!container) return;
@@ -205,9 +179,6 @@
         container.innerHTML = newHTML;
     }
 
-    /**
-     * Update recent activities section
-     */
     function updateRecentActivities(activities) {
         const container = document.querySelector('.activity-list-v5');
         if (!container || !activities || activities.length === 0) return;
@@ -265,9 +236,6 @@
         container.innerHTML = newActivities;
     }
 
-    /**
-     * Animate progress bars
-     */
     function animateProgressBars() {
         const progressBars = document.querySelectorAll('.progress-bar-v5');
         progressBars.forEach(bar => {
@@ -278,9 +246,6 @@
         });
     }
 
-    /**
-     * Animate stat numbers
-     */
     function animateStatNumbers() {
         const statValues = document.querySelectorAll('.stat-value-v5');
         statValues.forEach((stat) => {
@@ -302,9 +267,6 @@
         });
     }
 
-    /**
-     * Animate a number from start to end
-     */
     function animateValue(element, start, end, duration, hasPercent = false) {
         if (end === 0) {
             element.textContent = hasPercent ? '0%' : '0';
@@ -324,9 +286,6 @@
         }, stepTime);
     }
 
-    /**
-     * Check localStorage for recently updated profile picture
-     */
     function checkSavedProfilePicture() {
         const savedPicUrl = localStorage.getItem('profile_picture_updated');
         const timestamp = localStorage.getItem('profile_picture_timestamp');
@@ -344,19 +303,14 @@
         }
     }
 
-    /**
-     * Check localStorage for recently updated profile name
-     */
     function checkSavedProfileName() {
         const savedName = localStorage.getItem('profile_name_updated');
         const timestamp = localStorage.getItem('profile_update_timestamp');
         
-        // Only use cached name if updated within last 5 minutes
         if (savedName && timestamp) {
             const ageMinutes = (Date.now() - parseInt(timestamp)) / 60000;
             if (ageMinutes < 5) {
                 updateProfileName(savedName);
-                // Don't remove - let it persist for multiple page visits
             } else {
                 // Clean up old cache
                 localStorage.removeItem('profile_name_updated');
@@ -364,10 +318,6 @@
             }
         }
     }
-
-    /**
-     * Setup listener for profile picture updates from other tabs/windows
-     */
     function setupProfilePictureListener() {
         window.addEventListener('storage', function(e) {
             if (e.key === 'profile_picture_updated' && e.newValue) {
@@ -376,9 +326,6 @@
         });
     }
 
-    /**
-     * Setup listener for profile name updates from settings page
-     */
     function setupProfileNameListener() {
         window.addEventListener('storage', function(e) {
             if (e.key === 'profile_name_updated' && e.newValue) {
@@ -387,9 +334,6 @@
         });
     }
 
-    /**
-     * Update profile picture element
-     */
     function updateProfilePicture(pictureUrl) {
         const dashboardPic = document.getElementById('dashboardProfilePic');
         if (dashboardPic) {
@@ -407,11 +351,7 @@
         }
     }
 
-    /**
-     * Update profile name in dashboard and navbar
-     */
     function updateProfileName(newName) {
-        // Update welcome section heading
         const welcomeTitle = document.querySelector('.welcome-text-v5 h1');
         if (welcomeTitle) {
             // Extract first name from full name
@@ -436,9 +376,6 @@
         }
     }
 
-    /**
-     * Utility: Escape HTML special characters
-     */
     function escapeHtml(text) {
         const map = {
             '&': '&amp;',
@@ -450,16 +387,10 @@
         return text.replace(/[&<>"']/g, m => map[m]);
     }
 
-    /**
-     * Utility: Capitalize first letter
-     */
     function capitalizeFirst(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
-    /**
-     * Utility: Format datetime for display
-     */
     function formatDateTime(datetime) {
         const date = new Date(datetime);
         const now = new Date();
@@ -482,9 +413,6 @@
         });
     }
 
-    /**
-     * Cleanup on page unload
-     */
     window.addEventListener('beforeunload', function() {
         if (updateInterval) clearInterval(updateInterval);
     });

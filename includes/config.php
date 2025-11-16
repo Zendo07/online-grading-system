@@ -26,7 +26,7 @@ define('CSS_PATH', BASE_URL . 'assets/css/');
 
 // Security settings
 define('PASSWORD_MIN_LENGTH', 8);
-define('SESSION_TIMEOUT', 3600); // 1 hour in seconds
+define('SESSION_TIMEOUT', 3600); 
 
 // Teacher invitation code (can be changed)
 define('TEACHER_INVITATION_CODE', 'TEAC2025');

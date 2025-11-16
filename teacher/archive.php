@@ -3,7 +3,6 @@ require_once '../includes/config.php';
 require_once '../includes/session.php';
 require_once '../includes/functions.php';
 
-// Require teacher access
 requireTeacher();
 
 $teacher_id = $_SESSION['user_id'];

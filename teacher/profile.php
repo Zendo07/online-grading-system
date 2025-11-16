@@ -3,12 +3,10 @@ require_once '../includes/config.php';
 require_once '../includes/session.php';
 require_once '../includes/functions.php';
 
-// Require teacher access
 requireTeacher();
 
 $teacher_id = $_SESSION['user_id'];
 
-// Get teacher data
 try {
     $stmt = $conn->prepare("SELECT * FROM users WHERE user_id = ?");
     $stmt->execute([$teacher_id]);
@@ -136,7 +134,6 @@ $flash = getFlashMessage();
         const formData = new FormData();
         formData.append('profile_picture', input.files[0]);
         
-        // Preview image immediately
         const reader = new FileReader();
         reader.onload = function(e) {
             document.getElementById('profilePreview').src = e.target.result;
@@ -153,27 +150,24 @@ $flash = getFlashMessage();
             if (data.success) {
                 alert('✅ Profile picture updated successfully!');
                 
-                // Update navbar profile button with returned URL
+                
                 const profileButton = document.querySelector('.profile-button img');
                 if (profileButton && data.picture_url) {
-                    // Add timestamp to bypass cache
+
                     profileButton.src = data.picture_url + '?t=' + new Date().getTime();
                 }
                 
-                // Optional: Reload page after delay to ensure all elements update
                 setTimeout(() => {
                     window.location.reload();
                 }, 1500);
             } else {
                 alert('❌ Error: ' + data.message);
-                // Reset preview on error
                 document.getElementById('profilePreview').src = '<?php echo getProfilePicture($teacher['profile_picture'], $teacher['full_name']); ?>';
             }
         })
         .catch(error => {
             console.error('Error:', error);
             alert('❌ Failed to upload profile picture');
-            // Reset preview on error
             document.getElementById('profilePreview').src = '<?php echo getProfilePicture($teacher['profile_picture'], $teacher['full_name']); ?>';
         });
     }

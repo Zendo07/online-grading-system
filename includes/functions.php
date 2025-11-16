@@ -1,6 +1,4 @@
 <?php
-// Reusable PHP Functions - FIXED PROFILE PICTURE HANDLING
-
 // Sanitize input data
 function sanitize($data) {
     $data = trim($data);
@@ -120,7 +118,7 @@ function getClassByCode($conn, $class_code) {
 // Display success message
 function setFlashMessage($type, $message) {
     $_SESSION['flash_message'] = [
-        'type' => $type, // success, error, warning, info
+        'type' => $type, 
         'message' => $message
     ];
 }
@@ -146,16 +144,13 @@ function redirectWithMessage($url, $type, $message) {
 function uploadProfilePicture($file, $user_id) {
     $upload_dir = __DIR__ . '/../uploads/profiles/';
     
-    // Create directory if not exists
     if (!file_exists($upload_dir)) {
         mkdir($upload_dir, 0755, true);
     }
     
-    // Validate file
     $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
     $max_size = 5 * 1024 * 1024; // 5MB
     
-    // Check file type
     $finfo = finfo_open(FILEINFO_MIME_TYPE);
     $mime_type = finfo_file($finfo, $file['tmp_name']);
     finfo_close($finfo);
@@ -187,30 +182,17 @@ function uploadProfilePicture($file, $user_id) {
     return ['success' => false, 'message' => 'Failed to save file to server.'];
 }
 
-/**
- * Get profile picture URL - FIXED VERSION
- * Returns default avatar for new accounts (NULL or empty profile_picture)
- * Returns uploaded picture only if it exists in database AND file exists on disk
- * 
- * @param string|null $profile_picture - Filename from database (can be NULL or empty for new accounts)
- * @param string $full_name - User's full name (fallback for generating initials)
- * @return string - Full URL to profile picture or default avatar
- */
 function getProfilePicture($profile_picture, $full_name = '') {
-    // CRITICAL: If profile_picture is NULL or empty, return default avatar
     if (empty($profile_picture) || is_null($profile_picture)) {
         return BASE_URL . 'assets/images/default-avatar.jpg';
     }
     
-    // Check if the uploaded file exists on disk
     $file_path = __DIR__ . '/../uploads/profiles/' . $profile_picture;
     
     if (file_exists($file_path)) {
-        // File exists, return the uploaded profile picture
         return BASE_URL . 'uploads/profiles/' . $profile_picture;
     }
     
-    // File doesn't exist (deleted or corrupted), return default avatar
     return BASE_URL . 'assets/images/default-avatar.jpg';
 }
 
@@ -246,7 +228,6 @@ function calculateOverallGrade($conn, $student_id, $class_id) {
     ];
 }
 
-// Get missing activities for a student
 function getMissingActivities($conn, $student_id, $class_id) {
     // Get all activities in the class
     $stmt = $conn->prepare("
@@ -266,7 +247,6 @@ function getMissingActivities($conn, $student_id, $class_id) {
     $stmt->execute([$student_id, $class_id]);
     $submitted = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
     
-    // Find missing activities
     $missing = [];
     foreach ($all_activities as $activity) {
         $key = $activity['activity_name'] . '_' . $activity['grading_period'];

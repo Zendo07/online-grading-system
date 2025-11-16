@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Schedule Function</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .status {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .btn-add-schedule {
+            background: #7b2d26;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-add-schedule:hover {
+            background: #a74c42;
+        }
+        
+        #schedulesContainer {
+            margin-top: 20px;
+        }
+        
+        .schedule-item {
+            background: #f9f9f9;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+        }
+        
+        .schedule-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .schedule-badge {
+            font-weight: bold;
+            color: #7b2d26;
+        }
+        
+        .btn-remove-schedule {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .schedule-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .schedule-col, .schedule-col-full {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .schedule-label {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .schedule-select, .schedule-input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        form {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #eee;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn-submit {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .console-output {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .console-line {
+            margin: 3px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Schedule Function Test Page</h1>
+        <p>This is a simple test page to verify the schedule functionality works.</p>
+        
+        <div id="statusBox"></div>
+        
+        <form id="createClassForm">
+            <h2>Add Schedules</h2>
+            <p>Click the button below to add schedule forms:</p>
+            
+            <button type="button" class="btn-add-schedule" id="addScheduleBtn">
+                <i class="fas fa-plus"></i>
+                Add Schedule
+            </button>
+            
+            <div id="schedulesContainer"></div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-check"></i>
+                    Test Submit
+                </button>
+            </div>
+        </form>
+        
+        <h3>Console Output:</h3>
+        <div class="console-output" id="consoleOutput"></div>
+    </div>
+    
+    <script>
+        // Capture console.log
+        const consoleDiv = document.getElementById('consoleOutput');
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const line = document.createElement('div');
+            line.className = 'console-line';
+            line.textContent = args.join(' ');
+            consoleDiv.appendChild(line);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        };
+        
+        const originalError = console.error;
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            const line = document.createElement('div');
+            line.className = 'console-line';
+            line.style.color = '#ff6666';
+            line.textContent = 'ERROR: ' + args.join(' ');
+            consoleDiv.appendChild(line);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        };
+        
+        // Show status
+        function showStatus(message, isSuccess) {
+            const statusBox = document.getElementById('statusBox');
+            statusBox.className = 'status ' + (isSuccess ? 'success' : 'error');
+            statusBox.innerHTML = '<i class="fas fa-' + (isSuccess ? 'check-circle' : 'exclamation-circle') + '"></i> ' + message;
+        }
+        
+        showStatus('Waiting for script to load...', false);
+        
+        // Check if elements exist
+        setTimeout(function() {
+            const btn = document.getElementById('addScheduleBtn');
+            const container = document.getElementById('schedulesContainer');
+            const form = document.getElementById('createClassForm');
+            
+            if (btn && container && form) {
+                showStatus('✅ All elements found! Script should be working.', true);
+            } else {
+                showStatus('❌ Missing elements!', false);
+            }
+        }, 500);
+    </script>
+    
+    <!-- Load the schedule script -->
+    <script src="assets/js/create-class-schedule.js"></script>
+</body>
+</html>

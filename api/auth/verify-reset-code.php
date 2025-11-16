@@ -1,5 +1,5 @@
 <?php
-// Remove all output before this
+
 ob_start();
 
 require_once '../../includes/config.php';
@@ -7,7 +7,6 @@ require_once '../../includes/functions.php';
 
 session_start();
 
-// Clear any previous output
 ob_end_clean();
 
 header('Content-Type: application/json');

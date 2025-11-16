@@ -1,14 +1,6 @@
-/**
- * Student Profile - Identity-Focused Minimal Design
- * Clean, simple interactions for profile management
- */
-
 (function() {
     'use strict';
 
-    /**
-     * Initialize profile functionality
-     */
     function initProfile() {
         setupProfilePictureUpload();
         setupFlashMessages();
@@ -16,9 +8,6 @@
         addNotificationStyles();
     }
 
-    /**
-     * Setup profile picture upload functionality
-     */
     function setupProfilePictureUpload() {
         const uploadBtn = document.querySelector('.btn-change-photo');
         
@@ -57,9 +46,6 @@
         }
     }
 
-    /**
-     * Upload profile picture via AJAX
-     */
     function uploadProfilePicture(file) {
         const formData = new FormData();
         formData.append('profile_picture', file);
@@ -80,7 +66,6 @@
             if (data.success) {
                 const timestamp = new Date().getTime();
                 
-                // Update main profile picture with smooth transition
                 const profileImg = document.getElementById('profileImage');
                 if (profileImg) {
                     profileImg.style.transition = 'opacity 0.5s ease';
@@ -91,13 +76,11 @@
                     }, 500);
                 }
                 
-                // Update navbar profile picture
                 const navbarImg = document.querySelector('.profile-button img');
                 if (navbarImg) {
                     navbarImg.src = data.picture_url + '&cache=' + timestamp;
                 }
                 
-                // Update sidebar profile picture if exists
                 const sidebarImg = document.querySelector('.sidebar-user-avatar img');
                 if (sidebarImg) {
                     sidebarImg.src = data.picture_url + '&cache=' + timestamp;
@@ -119,9 +102,6 @@
         });
     }
 
-    /**
-     * Show notification toast
-     */
     function showNotification(title, message, type) {
         const existingNotifications = document.querySelectorAll('.profile-notification');
         existingNotifications.forEach(notif => notif.remove());
@@ -154,9 +134,6 @@
         }, 5000);
     }
 
-    /**
-     * Add notification styles dynamically
-     */
     function addNotificationStyles() {
         if (!document.getElementById('profile-notification-styles')) {
             const style = document.createElement('style');
@@ -267,9 +244,6 @@
         }
     }
 
-    /**
-     * Auto-dismiss flash messages with smooth animation
-     */
     function setupFlashMessages() {
         const alerts = document.querySelectorAll('.alert');
         
@@ -308,9 +282,6 @@
         });
     }
 
-    /**
-     * Setup button hover animations
-     */
     function setupButtonAnimations() {
         const buttons = document.querySelectorAll('.action-button-compact');
         
@@ -335,18 +306,12 @@
         });
     }
 
-    /**
-     * Initialize when DOM is ready
-     */
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initProfile);
     } else {
         initProfile();
     }
 
-    /**
-     * Export for global use
-     */
     window.StudentProfile = {
         showNotification: showNotification
     };

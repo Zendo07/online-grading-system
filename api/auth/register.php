@@ -1,7 +1,4 @@
 <?php
-// auth/register.php - Role Router
-
-// If a role is already passed in URL, redirect immediately
 if (isset($_GET['role'])) {
     $role = strtolower($_GET['role']);
 
@@ -14,7 +11,6 @@ if (isset($_GET['role'])) {
     }
 }
 
-// If no role specified, redirect to login
 header('Location: login.php');
 exit;
 ?>

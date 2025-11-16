@@ -3,10 +3,8 @@ require_once '../../includes/config.php';
 require_once '../../includes/session.php';
 require_once '../../includes/functions.php';
 
-// Require student access
 requireStudent();
 
-// Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ' . BASE_URL . 'student/profile.php');
     exit();
@@ -15,7 +13,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $full_name = sanitize($_POST['full_name']);
 $user_id = $_SESSION['user_id'];
 
-// Validate input
 if (empty($full_name)) {
     redirectWithMessage(BASE_URL . 'student/profile.php', 'danger', 'Full name is required.');
 }

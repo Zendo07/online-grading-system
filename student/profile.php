@@ -1,14 +1,9 @@
 <?php
-/**
- * Student Profile Page - Identity-Focused Minimal Design
- * Student information is the main spotlight
- */
 
 require_once '../includes/config.php';
 require_once '../includes/session.php';
 require_once '../includes/functions.php';
 
-// Require student access
 requireStudent();
 
 $student_id = $_SESSION['user_id'];
@@ -41,12 +36,10 @@ try {
         redirectWithMessage(BASE_URL . 'student/dashboard.php', 'danger', 'Student information not found.');
     }
     
-    // Parse full name into components
     $name_parts = explode(' ', $student_info['full_name']);
     $first_name = $name_parts[0] ?? '';
     $last_name = $name_parts[count($name_parts) - 1] ?? '';
     
-    // Get middle initial from middle_name field
     $middle_initial = '';
     if (!empty($student_info['middle_name'])) {
         $middle_initial = strtoupper(substr(trim($student_info['middle_name']), 0, 1)) . '.';
@@ -56,18 +49,15 @@ try {
         }
     }
     
-    // Format full name display
     $full_name_display = $last_name . ', ' . $first_name;
     if ($middle_initial) {
         $full_name_display .= ' ' . $middle_initial;
     }
     
-    // Get program and year_section
     $program = $student_info['program'] ?? 'Not Specified';
     $year_section = $student_info['year_section'] ?? 'Not Assigned';
     $course_display = $program . ' ' . $year_section;
     
-    // Get profile picture
     $profile_pic_url = getProfilePicture($student_info['profile_picture'] ?? null, $student_info['full_name']);
     
 } catch (PDOException $e) {
@@ -85,7 +75,7 @@ try {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="<?php echo CSS_PATH; ?>style.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="<?php echo CSS_PATH; ?>navigation.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="<?php echo CSS_PATH; ?>student-profile.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="<?php echo CSS_PATH; ?>student-pages/student-profile.css?v=<?php echo time(); ?>">
 </head>
 <body>
     <div class="dashboard-wrapper">
@@ -101,10 +91,8 @@ try {
                         </div>
                     <?php endif; ?>
 
-                    <!-- Main Profile Card -->
                     <div class="profile-main-card">
                         <div class="profile-content">
-                            <!-- Profile Image Container -->
                             <div class="profile-image-container">
                                 <div class="profile-image-wrapper">
                                     <img 
@@ -115,9 +103,7 @@ try {
                                 </div>
                             </div>
 
-                            <!-- Profile Details Container -->
                             <div class="profile-details-container">
-                                <!-- Name Section -->
                                 <div class="profile-name-section">
                                     <h1 class="profile-name"><?php echo htmlspecialchars($full_name_display); ?></h1>
                                     <p class="profile-course">
@@ -154,7 +140,6 @@ try {
                         </div>
                     </div>
 
-                    <!-- Compact Action Buttons -->
                     <div class="profile-actions-compact">
                         <a href="<?php echo BASE_URL; ?>student/profile-overview.php" class="action-button-compact">
                             <div class="action-button-icon">
@@ -179,6 +164,8 @@ try {
                     </div>
                 </div>
             </div>
+            
+            <?php include '../includes/footer.php'; ?>
         </div>
     </div>
 

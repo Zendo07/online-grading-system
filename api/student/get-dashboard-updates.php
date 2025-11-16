@@ -1,6 +1,4 @@
 <?php
-// api/student/get-dashboard-updates.php
-// Endpoint for realtime dashboard updates
 
 require_once '../../includes/config.php';
 require_once '../../includes/session.php';
@@ -8,7 +6,6 @@ require_once '../../includes/functions.php';
 
 header('Content-Type: application/json');
 
-// Require student access
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'student') {
     echo json_encode(['success' => false, 'message' => 'Unauthorized']);
     exit();
@@ -17,7 +14,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'student') {
 $student_id = $_SESSION['user_id'];
 
 try {
-    // Active Courses
     $stmt = $conn->prepare("
         SELECT COUNT(*) as total 
         FROM enrollments 

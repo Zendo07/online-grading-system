@@ -1,6 +1,3 @@
-/* Main Stylesheet - Online Grading System */
-
-/* Reset & Base Styles */
 * {
     margin: 0;
     padding: 0;
@@ -20,7 +17,7 @@
     --info-color: #3b82f6;
     --dark-color: #2B1F1F;
     --dark-maroon: #5C3030;
-    --light-color: #FFE5C4; /* Light Peach */
+    --light-color: #FFE5C4;
     --white-color: #ffffff;
     --cream-color: #F5E6D3;
     --border-color: #e5d5c5;

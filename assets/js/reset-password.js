@@ -1,9 +1,3 @@
-/**
- * ========================================
- * RESET PASSWORD - JAVASCRIPT (FIXED)
- * ========================================
- */
-
 const codeInputs = document.querySelectorAll('.code-input');
 const verifyBtn = document.getElementById('verifyBtn');
 const resendBtn = document.getElementById('resendBtn');

@@ -1,20 +1,14 @@
 <?php
-/**
- * Registration Handler with Email Verification - FIXED
- * Updated: Year & Section validation, proper field order, profile picture fix
- */
 
 require_once '../../includes/config.php';
 require_once '../../includes/session.php';
 require_once '../../includes/functions.php';
 require_once '../../includes/email-config.php';
 
-// Prevent access if already logged in
 if (isLoggedIn()) {
     redirectToDashboard();
 }
 
-// Check if form was submitted via POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     redirectWithMessage(BASE_URL . 'auth/login.php', 'danger', 'Invalid request method.');
 }
@@ -73,16 +67,14 @@ try {
         $middle_name = trim($_POST['middle_name'] ?? '');
         $last_name = trim($_POST['last_name'] ?? '');
         $program = trim($_POST['program'] ?? '');
-        $year_section = strtoupper(trim($_POST['year_section'] ?? '')); // Convert to uppercase
+        $year_section = strtoupper(trim($_POST['year_section'] ?? '')); 
         $student_number = trim($_POST['student_number'] ?? '');
         $contact_number = trim($_POST['contact_number'] ?? '');
         
-        // Validate required fields
         if (empty($first_name) || empty($last_name) || empty($program) || empty($year_section) || empty($student_number)) {
             redirectWithMessage(BASE_URL . 'auth/student-register.php', 'danger', 'All required fields must be filled.');
         }
         
-        // Validate name fields (letters and spaces only)
         if (!preg_match('/^[a-zA-Z\s]+$/', $first_name)) {
             redirectWithMessage(BASE_URL . 'auth/student-register.php', 'danger', 'First name must contain only letters.');
         }
@@ -91,28 +83,23 @@ try {
             redirectWithMessage(BASE_URL . 'auth/student-register.php', 'danger', 'Last name must contain only letters.');
         }
         
-        // Validate middle name if provided
         if (!empty($middle_name) && !preg_match('/^[a-zA-Z\s]+$/', $middle_name)) {
             redirectWithMessage(BASE_URL . 'auth/student-register.php', 'danger', 'Middle name must contain only letters.');
         }
         
-        // Validate program
         $valid_programs = ['BSIT', 'BSCS', 'ACT', 'BSIS'];
         if (!in_array($program, $valid_programs)) {
             redirectWithMessage(BASE_URL . 'auth/student-register.php', 'danger', 'Invalid program selected.');
         }
         
-        // Validate Year & Section format: 1-4 (year) + dash + A-Z (section)
         if (!preg_match('/^[1-4]-[A-Z]$/', $year_section)) {
             redirectWithMessage(BASE_URL . 'auth/student-register.php', 'danger', 'Year & Section must be in format: 1-A, 2-B, 3-C, or 4-D (year 1-4, section A-Z).');
         }
         
-        // Validate student number format (exactly 10 digits)
         if (!preg_match('/^\d{10}$/', $student_number)) {
             redirectWithMessage(BASE_URL . 'auth/student-register.php', 'danger', 'Student number must be exactly 10 digits.');
         }
         
-        // Validate contact number if provided (exactly 11 digits, Philippine format)
         if (!empty($contact_number)) {
             $contact_number = preg_replace('/[^0-9]/', '', $contact_number);
             
@@ -125,14 +112,12 @@ try {
             }
         }
         
-        // Build full name with middle name if provided
         if (!empty($middle_name)) {
             $full_name = $first_name . ' ' . $middle_name . ' ' . $last_name;
         } else {
             $full_name = $first_name . ' ' . $last_name;
         }
         
-        // Check if student number already exists
         $stmt = $conn->prepare("
             SELECT user_id 
             FROM users 
@@ -155,7 +140,6 @@ try {
             redirectWithMessage(BASE_URL . 'auth/student-register.php', 'danger', 'Failed to send verification email. Please check your email address and try again.');
         }
         
-        // Store registration data in session (NOT in database yet - only after verification)
         $_SESSION['pending_registration'] = [
             'email' => $email,
             'password' => $hashed_password,
@@ -167,11 +151,11 @@ try {
             'contact_number' => $contact_number ?: null,
             'student_number' => $student_number,
             'program' => $program,
-            'year_section' => $year_section, // Store in new format (1-A, 2-B, etc.)
+            'year_section' => $year_section, 
             'verification_code' => $verification_code,
             'expires_at' => $expires_at,
             'code_id' => null,
-            'profile_picture' => null // IMPORTANT: Set to null for new accounts
+            'profile_picture' => null 
         ];
         
         // Redirect to verification page
@@ -191,12 +175,10 @@ try {
         $invitation_code = trim($_POST['invitation_code'] ?? '');
         $contact_number = trim($_POST['contact_number'] ?? '');
         
-        // Validate required fields
         if (empty($first_name) || empty($last_name) || empty($invitation_code)) {
             redirectWithMessage(BASE_URL . 'auth/teacher-register.php', 'danger', 'All fields are required for teacher registration.');
         }
         
-        // Validate name fields (letters and spaces only)
         if (!preg_match('/^[a-zA-Z\s]+$/', $first_name)) {
             redirectWithMessage(BASE_URL . 'auth/teacher-register.php', 'danger', 'First name must contain only letters.');
         }
@@ -205,10 +187,8 @@ try {
             redirectWithMessage(BASE_URL . 'auth/teacher-register.php', 'danger', 'Last name must contain only letters.');
         }
         
-        // Build full name
         $full_name = $first_name . ' ' . $last_name;
         
-        // Validate contact number if provided
         if (!empty($contact_number)) {
             $contact_number = preg_replace('/[^0-9]/', '', $contact_number);
             
@@ -261,10 +241,9 @@ try {
             'verification_code' => $verification_code,
             'expires_at' => $expires_at,
             'code_id' => $code_info['code_id'],
-            'profile_picture' => null // IMPORTANT: Set to null for new accounts
+            'profile_picture' => null 
         ];
         
-        // Redirect to verification page
         redirectWithMessage(
             BASE_URL . 'auth/verify-email.php',
             'success',
@@ -273,7 +252,7 @@ try {
     }
     
 } catch (PDOException $e) {
-    // Database error
+    
     error_log("Database Error in Registration: " . $e->getMessage());
     error_log("Stack trace: " . $e->getTraceAsString());
     
@@ -284,7 +263,7 @@ try {
     );
     
 } catch (Exception $e) {
-    // General error
+
     error_log("Registration Error: " . $e->getMessage());
     error_log("Stack trace: " . $e->getTraceAsString());
     

@@ -1,27 +1,20 @@
 <?php
-/**
- * Resend Password Reset Code Handler - FIXED
- * Generates and sends a new password reset code
- */
 
 require_once '../../includes/config.php';
 require_once '../../includes/functions.php';
 require_once '../../includes/email-config.php';
 
-// Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 header('Content-Type: application/json');
 
-// Only allow POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'message' => 'Invalid request method']);
     exit();
 }
 
-// Check if reset session exists
 if (!isset($_SESSION['reset_email'])) {
     echo json_encode(['success' => false, 'message' => 'No reset session found. Please start the password reset process again.']);
     exit();
@@ -30,7 +23,6 @@ if (!isset($_SESSION['reset_email'])) {
 $email = $_SESSION['reset_email'];
 
 try {
-    // Rate limiting - max 3 requests in 5 minutes
     $stmt = $conn->prepare("
         SELECT COUNT(*) as count 
         FROM password_resets 
@@ -88,10 +80,8 @@ try {
         exit();
     }
 
-    // Commit transaction
     $conn->commit();
 
-    // SUCCESS response
     echo json_encode([
         'success' => true, 
         'message' => 'A new reset code has been sent to your email successfully!'
@@ -99,7 +89,6 @@ try {
     exit();
 
 } catch (PDOException $e) {
-    // Rollback transaction on error
     if ($conn->inTransaction()) {
         $conn->rollBack();
     }

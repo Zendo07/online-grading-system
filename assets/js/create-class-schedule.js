@@ -1,300 +1,201 @@
-// create-class-schedule.js - FIXED VERSION WITH NO CONFLICTS
+console.log('🔵 Loading NEW Schedule Script v2.0');
 
-(function() {
-    'use strict';
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔵 DOM Ready - Initializing Schedule Manager');
     
-    let scheduleCount = 0;
-    let isInitialized = false;
-    
+    let scheduleCounter = 0;
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const addButton = document.getElementById('addScheduleBtn');
+    const container = document.getElementById('schedulesContainer');
+    const form = document.getElementById('createClassForm');
     
-    // Wait for DOM to be ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
+    if (!addButton || !container || !form) {
+        console.log('⚠️ Not on create class page, skipping initialization');
+        return;
     }
     
-    function init() {
-        // Prevent double initialization
-        if (isInitialized) return;
-        isInitialized = true;
-        
-        console.log('Initializing schedule manager...');
-        
-        setupAddScheduleButton();
-        setupFormSubmission();
-        setupInputAnimations();
-        animateSteps();
-    }
+    console.log('✅ Found all required elements');
+    console.log('Button:', addButton);
+    console.log('Container:', container);
+    console.log('Form:', form);
     
-    function setupAddScheduleButton() {
-        const addBtn = document.getElementById('addScheduleBtn');
-        if (!addBtn) {
-            console.error('Add schedule button not found');
-            return;
-        }
+    addButton.addEventListener('click', function(event) {
+        event.preventDefault();
+        console.log('🟢 ADD SCHEDULE CLICKED!');
+        addNewSchedule();
+    });
+    
+    console.log('✅ Button listener attached');
+    function addNewSchedule() {
+        scheduleCounter++;
+        console.log('➕ Creating schedule #' + scheduleCounter);
+        const scheduleHTML = `
+            <div class="schedule-item" data-schedule-id="${scheduleCounter}" style="opacity: 0; transform: translateY(-20px); transition: all 0.3s ease;">
+                <div class="schedule-item-header">
+                    <span class="schedule-badge">Schedule ${scheduleCounter}</span>
+                    <button type="button" class="btn-remove-schedule" data-id="${scheduleCounter}">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+                
+                <div class="schedule-item-body">
+                    <div class="schedule-row">
+                        <div class="schedule-col">
+                            <label class="schedule-label">
+                                <i class="fas fa-calendar-day"></i>
+                                Day
+                            </label>
+                            <select name="schedules[${scheduleCounter}][day]" class="schedule-select" required>
+                                <option value="">Select Day</option>
+                                <option value="Monday">Monday</option>
+                                <option value="Tuesday">Tuesday</option>
+                                <option value="Wednesday">Wednesday</option>
+                                <option value="Thursday">Thursday</option>
+                                <option value="Friday">Friday</option>
+                                <option value="Saturday">Saturday</option>
+                                <option value="Sunday">Sunday</option>
+                            </select>
+                        </div>
+                        
+                        <div class="schedule-col">
+                            <label class="schedule-label">
+                                <i class="fas fa-clock"></i>
+                                Start Time
+                            </label>
+                            <input 
+                                type="time" 
+                                name="schedules[${scheduleCounter}][start_time]" 
+                                class="schedule-input"
+                                required
+                            >
+                        </div>
+                        
+                        <div class="schedule-col">
+                            <label class="schedule-label">
+                                <i class="fas fa-clock"></i>
+                                End Time
+                            </label>
+                            <input 
+                                type="time" 
+                                name="schedules[${scheduleCounter}][end_time]" 
+                                class="schedule-input"
+                                required
+                            >
+                        </div>
+                    </div>
+                    
+                    <div class="schedule-row">
+                        <div class="schedule-col-full">
+                            <label class="schedule-label">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Room/Location <span style="color: #999; font-weight: 400;">(Optional)</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                name="schedules[${scheduleCounter}][room]" 
+                                class="schedule-input"
+                                placeholder="e.g., Room 301, Building A"
+                                maxlength="100"
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
         
-        // Remove any existing listeners by cloning
-        const newAddBtn = addBtn.cloneNode(true);
-        addBtn.parentNode.replaceChild(newAddBtn, addBtn);
+        container.insertAdjacentHTML('beforeend', scheduleHTML);
+        const newSchedule = container.querySelector(`[data-schedule-id="${scheduleCounter}"]`);
+
+        setTimeout(function() {
+            newSchedule.style.opacity = '1';
+            newSchedule.style.transform = 'translateY(0)';
+        }, 10);
         
-        // Add single click listener
-        newAddBtn.addEventListener('click', function(e) {
+        const removeBtn = newSchedule.querySelector('.btn-remove-schedule');
+        removeBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            e.stopPropagation();
-            console.log('Add schedule clicked');
-            addSchedule();
-        }, false);
-    }
-    
-    function setupFormSubmission() {
-        const form = document.getElementById('createClassForm');
-        const submitBtn = document.getElementById('submitBtn');
+            const scheduleId = this.getAttribute('data-id');
+            console.log('🗑️ Removing schedule #' + scheduleId);
+            removeSchedule(scheduleId);
+        });
         
-        if (!form || !submitBtn) {
-            console.error('Form or submit button not found');
-            return;
-        }
+        const startTime = newSchedule.querySelector('input[name*="start_time"]');
+        const endTime = newSchedule.querySelector('input[name*="end_time"]');
         
-        // Remove existing submit listener by cloning
-        const newForm = form.cloneNode(true);
-        form.parentNode.replaceChild(newForm, form);
-        
-        // Re-setup add schedule button after cloning
-        setupAddScheduleButton();
-        
-        // Get new references
-        const currentForm = document.getElementById('createClassForm');
-        const currentSubmitBtn = document.getElementById('submitBtn');
-        
-        currentForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            console.log('Form submit triggered');
-            
-            // Validate required fields
-            if (!currentForm.checkValidity()) {
-                currentForm.reportValidity();
-                return false;
-            }
-            
-            // Validate schedule times
-            if (!validateAllSchedules()) {
-                return false;
-            }
-            
-            // Show loading state
-            showLoadingState(currentSubmitBtn);
-            
-            // Submit the form
-            console.log('Submitting form...');
-            currentForm.submit();
-        }, false);
-    }
-    
-    function validateAllSchedules() {
-        const scheduleItems = document.querySelectorAll('.schedule-item');
-        
-        for (let item of scheduleItems) {
-            const startTime = item.querySelector('input[name*="start_time"]');
-            const endTime = item.querySelector('input[name*="end_time"]');
-            
-            if (startTime && endTime && startTime.value && endTime.value) {
+        function validateTimes() {
+            if (startTime.value && endTime.value) {
                 if (startTime.value >= endTime.value) {
                     endTime.setCustomValidity('End time must be after start time');
-                    endTime.reportValidity();
-                    return false;
                 } else {
                     endTime.setCustomValidity('');
                 }
             }
         }
         
-        return true;
+        startTime.addEventListener('change', validateTimes);
+        endTime.addEventListener('change', validateTimes);
+        
+        console.log('✅ Schedule #' + scheduleCounter + ' added successfully!');
+        
+        // Scroll to it
+        setTimeout(function() {
+            newSchedule.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 350);
     }
     
-    function showLoadingState(btn) {
-        const btnText = btn.querySelector('span');
-        const btnIcon = btn.querySelector('i.fa-check');
-        const btnLoader = btn.querySelector('.btn-loader');
+    // Function to remove a schedule
+    function removeSchedule(scheduleId) {
+        const scheduleItem = container.querySelector(`[data-schedule-id="${scheduleId}"]`);
         
-        if (btnIcon) btnIcon.style.display = 'none';
-        if (btnText) btnText.textContent = 'Creating...';
-        if (btnLoader) btnLoader.style.display = 'inline-block';
-        
-        btn.disabled = true;
-        btn.style.opacity = '0.7';
-    }
-    
-    function addSchedule() {
-        scheduleCount++;
-        const container = document.getElementById('schedulesContainer');
-        
-        if (!container) {
-            console.error('Schedules container not found');
+        if (!scheduleItem) {
+            console.warn('⚠️ Schedule not found');
             return;
         }
         
-        console.log('Adding schedule #' + scheduleCount);
+        // Animate out
+        scheduleItem.style.opacity = '0';
+        scheduleItem.style.transform = 'translateX(-100%)';
         
-        const scheduleItem = document.createElement('div');
-        scheduleItem.className = 'schedule-item';
-        scheduleItem.setAttribute('data-schedule-id', scheduleCount);
-        
-        scheduleItem.innerHTML = `
-            <div class="schedule-item-header">
-                <span class="schedule-badge">Schedule ${scheduleCount}</span>
-                <button type="button" class="btn-remove-schedule" data-schedule-id="${scheduleCount}" aria-label="Remove schedule ${scheduleCount}">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-            </div>
-            
-            <div class="schedule-item-body">
-                <div class="schedule-row">
-                    <div class="schedule-col">
-                        <label class="schedule-label">
-                            <i class="fas fa-calendar-day"></i>
-                            Day
-                        </label>
-                        <select name="schedules[${scheduleCount}][day]" class="schedule-select" required>
-                            <option value="">Select Day</option>
-                            ${days.map(day => `<option value="${day}">${day}</option>`).join('')}
-                        </select>
-                    </div>
-                    
-                    <div class="schedule-col">
-                        <label class="schedule-label">
-                            <i class="fas fa-clock"></i>
-                            Start Time
-                        </label>
-                        <input 
-                            type="time" 
-                            name="schedules[${scheduleCount}][start_time]" 
-                            class="schedule-input"
-                            required
-                        >
-                    </div>
-                    
-                    <div class="schedule-col">
-                        <label class="schedule-label">
-                            <i class="fas fa-clock"></i>
-                            End Time
-                        </label>
-                        <input 
-                            type="time" 
-                            name="schedules[${scheduleCount}][end_time]" 
-                            class="schedule-input"
-                            required
-                        >
-                    </div>
-                </div>
-                
-                <div class="schedule-row">
-                    <div class="schedule-col-full">
-                        <label class="schedule-label">
-                            <i class="fas fa-map-marker-alt"></i>
-                            Room/Location <span style="color: #64748b; font-weight: 400;">(Optional)</span>
-                        </label>
-                        <input 
-                            type="text" 
-                            name="schedules[${scheduleCount}][room]" 
-                            class="schedule-input"
-                            placeholder="e.g., Room 301, Building A"
-                            maxlength="100"
-                        >
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        container.appendChild(scheduleItem);
-        
-        // Setup remove button
-        const removeBtn = scheduleItem.querySelector('.btn-remove-schedule');
-        removeBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            const id = parseInt(this.getAttribute('data-schedule-id'));
-            removeSchedule(id);
-        }, false);
-        
-        // Setup time validation
-        const startInput = scheduleItem.querySelector('input[name*="start_time"]');
-        const endInput = scheduleItem.querySelector('input[name*="end_time"]');
-        
-        if (startInput && endInput) {
-            startInput.addEventListener('change', function() {
-                validateTime(startInput, endInput);
-            });
-            
-            endInput.addEventListener('change', function() {
-                validateTime(startInput, endInput);
-            });
-        }
-        
-        console.log('Schedule #' + scheduleCount + ' added successfully');
-    }
-    
-    function removeSchedule(id) {
-        const item = document.querySelector(`[data-schedule-id="${id}"]`);
-        if (item) {
-            console.log('Removing schedule #' + id);
-            item.remove();
+        // Remove after animation
+        setTimeout(function() {
+            scheduleItem.remove();
             renumberSchedules();
-        }
+            console.log('✅ Schedule removed');
+        }, 300);
     }
     
+    // Renumber schedules after removal
     function renumberSchedules() {
-        const schedules = document.querySelectorAll('.schedule-item');
-        schedules.forEach((schedule, index) => {
+        const allSchedules = container.querySelectorAll('.schedule-item');
+        allSchedules.forEach(function(schedule, index) {
             const badge = schedule.querySelector('.schedule-badge');
             if (badge) {
-                badge.textContent = `Schedule ${index + 1}`;
-            }
-            // Update remove button aria-label
-            const removeBtn = schedule.querySelector('.btn-remove-schedule');
-            if (removeBtn) {
-                removeBtn.setAttribute('aria-label', `Remove schedule ${index + 1}`);
+                badge.textContent = 'Schedule ' + (index + 1);
             }
         });
+        console.log('✅ Renumbered ' + allSchedules.length + ' schedules');
     }
     
-    function validateTime(startInput, endInput) {
-        if (startInput.value && endInput.value) {
-            if (startInput.value >= endInput.value) {
-                endInput.setCustomValidity('End time must be after start time');
-                return false;
-            } else {
-                endInput.setCustomValidity('');
-                return true;
-            }
-        }
-        return true;
-    }
-    
-    function setupInputAnimations() {
-        document.addEventListener('focus', function(e) {
-            if (e.target.matches('.form-input-modern, .schedule-input, .schedule-select')) {
-                const wrapper = e.target.closest('.input-wrapper');
-                if (wrapper) wrapper.classList.add('focused');
-            }
-        }, true);
+    // Form submission handler
+    form.addEventListener('submit', function(e) {
+        console.log('📤 Form submitting...');
         
-        document.addEventListener('blur', function(e) {
-            if (e.target.matches('.form-input-modern, .schedule-input, .schedule-select')) {
-                const wrapper = e.target.closest('.input-wrapper');
-                if (wrapper) wrapper.classList.remove('focused');
-            }
-        }, true);
-    }
+        const submitBtn = document.getElementById('submitBtn');
+        if (submitBtn) {
+            const btnText = submitBtn.querySelector('span');
+            const btnIcon = submitBtn.querySelector('i.fa-check');
+            const btnLoader = submitBtn.querySelector('.btn-loader');
+            
+            if (btnIcon) btnIcon.style.display = 'none';
+            if (btnText) btnText.textContent = 'Creating...';
+            if (btnLoader) btnLoader.style.display = 'inline-block';
+            
+            submitBtn.disabled = true;
+        }
+    });
     
-    function animateSteps() {
-        const steps = document.querySelectorAll('.step-item');
-        steps.forEach((step, index) => {
-            step.style.animationDelay = `${index * 0.1}s`;
-        });
-    }
-    
-})();
+    console.log('🟢 Schedule Manager Ready!');
+    console.log('👉 Click "Add Schedule" button to test');
+});
+
+console.log('🔵 Schedule Script Loaded - Waiting for DOM');

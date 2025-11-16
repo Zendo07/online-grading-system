@@ -1,34 +1,22 @@
-/**
- * Account Settings - Interactive Functionality
- * Handle profile updates, password changes, and file uploads
- */
-
 (function() {
     'use strict';
 
     let originalFormData = {};
     let currentProfilePicture = null;
 
-    /**
-     * Initialize account settings
-     */
     function init() {
         setupProfileForm();
         setupPasswordModal();
         setupProfilePicture();
         storeOriginalData();
         addNotificationStyles();
-        clearOtherUserData(); // Clean up other users' data
+        clearOtherUserData(); 
     }
 
-    /**
-     * Clear localStorage data from other users
-     */
     function clearOtherUserData() {
         const currentUserId = getCurrentUserId();
         const storedUserId = localStorage.getItem('current_user_id');
         
-        // If different user, clear all profile data
         if (storedUserId && storedUserId !== currentUserId) {
             localStorage.removeItem('profile_picture_updated');
             localStorage.removeItem('profile_picture_timestamp');
@@ -36,34 +24,24 @@
             localStorage.removeItem('profile_update_timestamp');
         }
         
-        // Store current user ID
         localStorage.setItem('current_user_id', currentUserId);
     }
 
-    /**
-     * Get current user ID from page or session
-     */
     function getCurrentUserId() {
-        // Try to get from meta tag or global variable
         const metaUser = document.querySelector('meta[name="user-id"]');
         if (metaUser) {
             return metaUser.content;
         }
         
-        // Try from URL or other source
         const urlParams = new URLSearchParams(window.location.search);
         const userId = urlParams.get('user_id');
         if (userId) {
             return userId;
         }
         
-        // Generate from session time as fallback
         return 'user_' + Date.now();
     }
 
-    /**
-     * Store original form data for comparison
-     */
     function storeOriginalData() {
         const form = document.getElementById('profileForm');
         const formData = new FormData(form);
@@ -72,9 +50,6 @@
         });
     }
 
-    /**
-     * Check if form has changes
-     */
     function hasFormChanges() {
         const form = document.getElementById('profileForm');
         const formData = new FormData(form);
@@ -88,9 +63,6 @@
         return currentProfilePicture !== null;
     }
 
-    /**
-     * Setup profile form submission
-     */
     function setupProfileForm() {
         const form = document.getElementById('profileForm');
         const btnCancel = document.getElementById('btnCancelProfile');
@@ -122,13 +94,9 @@
         });
     }
 
-    /**
-     * Validate profile form
-     */
     function validateProfileForm() {
         let isValid = true;
 
-        // First Name
         const firstName = document.getElementById('firstName');
         if (!firstName.value.trim()) {
             showFieldError('firstName', 'First name is required');
@@ -137,7 +105,6 @@
             hideFieldError('firstName');
         }
 
-        // Last Name
         const lastName = document.getElementById('lastName');
         if (!lastName.value.trim()) {
             showFieldError('lastName', 'Last name is required');
@@ -146,7 +113,6 @@
             hideFieldError('lastName');
         }
 
-        // Program
         const program = document.getElementById('program');
         if (!program.value.trim()) {
             showFieldError('program', 'Course/Program is required');
@@ -155,7 +121,6 @@
             hideFieldError('program');
         }
 
-        // Year Section
         const yearSection = document.getElementById('yearSection');
         if (!yearSection.value.trim()) {
             showFieldError('yearSection', 'Year & Section is required');
@@ -164,7 +129,6 @@
             hideFieldError('yearSection');
         }
 
-        // Contact Number
         const contactNumber = document.getElementById('contactNumber');
         if (!contactNumber.value.trim()) {
             showFieldError('contactNumber', 'Contact number is required');
@@ -176,7 +140,6 @@
             hideFieldError('contactNumber');
         }
 
-        // Email
         const email = document.getElementById('email');
         if (!email.value.trim()) {
             showFieldError('email', 'Email is required');
@@ -191,9 +154,6 @@
         return isValid;
     }
 
-    /**
-     * Save profile changes
-     */
     async function saveProfileChanges() {
         const btnSave = document.getElementById('btnSaveProfile');
         const originalHTML = btnSave.innerHTML;
@@ -230,18 +190,15 @@
                 localStorage.setItem('profile_name_updated_' + userId, data.full_name);
                 localStorage.setItem('profile_update_timestamp_' + userId, Date.now().toString());
                 
-                // Legacy keys for backward compatibility (will be cleaned on next login)
                 localStorage.setItem('profile_name_updated', data.full_name);
                 localStorage.setItem('profile_update_timestamp', Date.now().toString());
                 
-                // Trigger storage event for other tabs
                 window.dispatchEvent(new StorageEvent('storage', {
                     key: 'profile_name_updated',
                     newValue: data.full_name,
                     url: window.location.href
                 }));
                 
-                // Reload after 2 seconds
                 setTimeout(() => {
                     window.location.reload();
                 }, 2000);
@@ -257,9 +214,6 @@
         }
     }
 
-    /**
-     * Reset profile form
-     */
     function resetProfileForm() {
         const form = document.getElementById('profileForm');
         form.reset();
@@ -276,9 +230,6 @@
         clearAllErrors();
     }
 
-    /**
-     * Setup profile picture upload
-     */
     function setupProfilePicture() {
         const btnUpload = document.getElementById('btnUploadPicture');
         const btnRemove = document.getElementById('btnRemovePicture');
@@ -292,13 +243,11 @@
             if (this.files && this.files[0]) {
                 const file = this.files[0];
 
-                // Validate file size (5MB)
                 if (file.size > 5 * 1024 * 1024) {
                     showNotification('File Too Large', 'File size must be less than 5MB', 'error');
                     return;
                 }
 
-                // Validate file type
                 if (!file.type.match('image/(jpeg|jpg|png)')) {
                     showNotification('Invalid File', 'Only JPG, JPEG, and PNG files are allowed', 'error');
                     return;
@@ -311,9 +260,6 @@
         btnRemove.addEventListener('click', removeProfilePicture);
     }
 
-    /**
-     * Upload profile picture
-     */
     async function uploadProfilePicture(file) {
         const formData = new FormData();
         formData.append('profile_picture', file);
@@ -333,26 +279,20 @@
             const data = await response.json();
 
             if (data.success) {
-                // Update preview
                 const img = document.getElementById('profilePictureImage');
                 img.src = data.picture_url + '&cache=' + new Date().getTime();
                 
-                // Update navbar
                 const navbarImg = document.querySelector('.profile-button img');
                 if (navbarImg) {
                     navbarImg.src = data.picture_url + '&cache=' + new Date().getTime();
                 }
 
-                // Store with user ID for isolation
                 const userId = getCurrentUserId();
                 localStorage.setItem('profile_picture_updated_' + userId, data.picture_url);
                 localStorage.setItem('profile_picture_timestamp_' + userId, Date.now().toString());
-                
-                // Legacy keys for backward compatibility
                 localStorage.setItem('profile_picture_updated', data.picture_url);
                 localStorage.setItem('profile_picture_timestamp', Date.now().toString());
                 
-                // Trigger storage event for other tabs/windows
                 window.dispatchEvent(new StorageEvent('storage', {
                     key: 'profile_picture_updated',
                     newValue: data.picture_url,
@@ -373,21 +313,14 @@
         }
     }
 
-    /**
-     * Remove profile picture
-     */
     async function removeProfilePicture() {
         if (!confirm('Are you sure you want to remove your profile picture?')) {
             return;
         }
 
-        // For now, just reset to default
         showNotification('Info', 'Profile picture removal will be implemented', 'warning');
     }
 
-    /**
-     * Setup password change modal
-     */
     function setupPasswordModal() {
         const modal = document.getElementById('passwordModal');
         const btnOpen = document.getElementById('btnOpenPasswordModal');
@@ -416,27 +349,18 @@
         });
     }
 
-    /**
-     * Open password modal
-     */
     function openPasswordModal() {
         const modal = document.getElementById('passwordModal');
         modal.classList.add('active');
         document.getElementById('currentPassword').focus();
     }
 
-    /**
-     * Close password modal
-     */
     function closePasswordModal() {
         const modal = document.getElementById('passwordModal');
         modal.classList.remove('active');
         resetPasswordForm();
     }
 
-    /**
-     * Validate password form
-     */
     function validatePasswordForm() {
         let isValid = true;
 
@@ -523,9 +447,6 @@
         }
     }
 
-    /**
-     * Clear all profile data from localStorage
-     */
     function clearAllProfileData() {
         const keys = Object.keys(localStorage);
         keys.forEach(key => {
@@ -535,18 +456,12 @@
         });
     }
 
-    /**
-     * Reset password form
-     */
     function resetPasswordForm() {
         const form = document.getElementById('passwordForm');
         form.reset();
         clearAllErrors();
     }
 
-    /**
-     * Show field error
-     */
     function showFieldError(fieldId, message) {
         const field = document.getElementById(fieldId);
         const error = document.getElementById(fieldId + 'Error');
@@ -556,9 +471,6 @@
         error.classList.add('show');
     }
 
-    /**
-     * Hide field error
-     */
     function hideFieldError(fieldId) {
         const field = document.getElementById(fieldId);
         const error = document.getElementById(fieldId + 'Error');
@@ -568,9 +480,6 @@
         error.classList.remove('show');
     }
 
-    /**
-     * Clear all errors
-     */
     function clearAllErrors() {
         document.querySelectorAll('.form-input, .form-select').forEach(field => {
             field.classList.remove('error');
@@ -581,23 +490,14 @@
         });
     }
 
-    /**
-     * Validate email
-     */
     function isValidEmail(email) {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
 
-    /**
-     * Validate phone
-     */
     function isValidPhone(phone) {
         return /^[\d\s\+\-\(\)]+$/.test(phone) && phone.replace(/\D/g, '').length >= 10;
     }
 
-    /**
-     * Update navbar info - ENHANCED VERSION
-     */
     function updateNavbarInfo(fullName) {
         // Update sidebar name
         const sidebarName = document.querySelector('.sidebar-user-name');
@@ -617,9 +517,6 @@
         }
     }
 
-    /**
-     * Show notification
-     */
     function showNotification(title, message, type) {
         const existingNotifications = document.querySelectorAll('.toast-notification');
         existingNotifications.forEach(notif => notif.remove());
@@ -656,9 +553,6 @@
         }, 5000);
     }
 
-    /**
-     * Add notification styles
-     */
     function addNotificationStyles() {
         if (!document.getElementById('toast-notification-styles')) {
             const style = document.createElement('style');
@@ -768,7 +662,6 @@
         }
     }
 
-    // Initialize
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {

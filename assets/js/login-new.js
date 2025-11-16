@@ -1,10 +1,6 @@
-// Login Page JavaScript
-
 document.addEventListener('DOMContentLoaded', function() {
-    // Create floating circles
     createFloatingCircles();
     
-    // Form submission
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
         loginForm.addEventListener('submit', function(e) {
@@ -14,7 +10,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Auto-dismiss alerts
     const alerts = document.querySelectorAll('.alert');
     alerts.forEach(alert => {
         setTimeout(() => {
@@ -27,7 +22,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Create floating circles animation
 function createFloatingCircles() {
     const circlesContainer = document.getElementById('circlesContainer');
     if (!circlesContainer) return;
@@ -39,7 +33,6 @@ function createFloatingCircles() {
         const circle = document.createElement('div');
         circle.className = 'circle';
         
-        // Random size between 50px and 200px
         const size = Math.random() * 150 + 50;
         circle.style.width = size + 'px';
         circle.style.height = size + 'px';
@@ -47,8 +40,6 @@ function createFloatingCircles() {
         // Random position
         circle.style.left = Math.random() * 100 + '%';
         circle.style.top = Math.random() * 100 + '%';
-        
-        // Random color
         circle.style.background = colors[Math.floor(Math.random() * colors.length)];
         
         // Random animation delay and duration

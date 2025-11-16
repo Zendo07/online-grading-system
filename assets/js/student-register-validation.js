@@ -1,12 +1,6 @@
-/**
- * Student Registration Form Validation - FIXED
- * Updated: Year & Section format validation (1-A, 2-B, etc.)
- */
-
 (function() {
   'use strict';
 
-  // Validation State Tracker
   const validationState = {
     first_name: false,
     last_name: false,
@@ -14,18 +8,14 @@
     program: false,
     year_section: false,
     student_number: false,
-    contact_number: true, // Optional
+    contact_number: true, 
     password: false,
     confirm_password: false
   };
 
-  // Get form elements
   const form = document.getElementById('registerForm');
   const submitBtn = document.getElementById('submitBtn');
 
-  /**
-   * Validate name fields
-   */
   function validateName(input, errorElementId, fieldName) {
     const value = input.value.trim();
     const errorElement = document.getElementById(errorElementId);
@@ -65,9 +55,6 @@
     return true;
   }
 
-  /**
-   * Validate email
-   */
   function validateEmail(input) {
     const value = input.value.trim();
     const errorElement = document.getElementById('email_error');
@@ -95,9 +82,6 @@
     return true;
   }
 
-  /**
-   * Validate program selection
-   */
   function validateProgram(select) {
     const value = select.value;
     const errorElement = document.getElementById('program_error');
@@ -117,10 +101,6 @@
     return true;
   }
 
-  /**
-   * Validate Year & Section - NEW FORMAT: 1-A, 2-B, 3-C, 4-D
-   * Format: [1-4]-[A-Z]
-   */
   function validateYearSection(input) {
     const value = input.value.trim().toUpperCase();
     const errorElement = document.getElementById('year_section_error');
@@ -153,9 +133,6 @@
     return true;
   }
 
-  /**
-   * Validate student number
-   */
   function validateStudentNumber(input) {
     const value = input.value.trim();
     const errorElement = document.getElementById('student_number_error');
@@ -197,9 +174,6 @@
     return false;
   }
 
-  /**
-   * Validate contact number
-   */
   function validateContactNumber(input) {
     const value = input.value.trim();
     const errorElement = document.getElementById('contact_number_error');
@@ -243,9 +217,6 @@
     return true;
   }
 
-  /**
-   * Validate password strength
-   */
   function validatePasswordStrength(input) {
     const value = input.value;
     const errorElement = document.getElementById('password_error');
@@ -307,9 +278,6 @@
     return true;
   }
 
-  /**
-   * Validate confirm password
-   */
   function validateConfirmPassword(input) {
     const value = input.value;
     const password = document.getElementById('password').value;
@@ -337,9 +305,6 @@
     return true;
   }
 
-  /**
-   * Update submit button state
-   */
   function updateSubmitButton() {
     const allValid = Object.values(validationState).every(v => v === true);
     submitBtn.disabled = !allValid;
@@ -353,9 +318,6 @@
     }
   }
 
-  /**
-   * Show toast notification
-   */
   function showToast(message, type) {
     const toast = document.getElementById('toast');
     if (!toast) return;
@@ -380,17 +342,12 @@
     }, 3000);
   }
 
-  /**
-   * Initialize event listeners
-   */
   function initializeValidation() {
-    // First Name
     document.getElementById('first_name').addEventListener('input', function() {
       validationState.first_name = validateName(this, 'first_name_error', 'First name');
       updateSubmitButton();
     });
 
-    // Middle Name (optional)
     const middleNameInput = document.getElementById('middle_name');
     if (middleNameInput) {
       middleNameInput.addEventListener('input', function() {
